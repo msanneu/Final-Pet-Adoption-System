@@ -1,7 +1,9 @@
 import os
 import re
 import csv
+import socket
 from io import StringIO
+from urllib.parse import urlparse
 from flask import Response
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -18,25 +20,54 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-app = Flask(__name__)
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase = None
+
 if supabase_url and supabase_key:
     supabase = create_client(supabase_url, supabase_key)
 
 
-remote_db = os.environ.get('DATABASE_URL')
-if remote_db:
+def _valid_remote_db_url(url):
+    if not url:
+        return False
+    if '[YOUR-PASSWORD]' in url:
+        return False
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return False
+    host = parsed.hostname
+    if not host:
+        return False
+    try:
+        socket.getaddrinfo(host, parsed.port or 5432)
+        return True
+    except OSError:
+        return False
+
+remote_db = os.environ.get('DATABASE_URL', '').strip()
+if remote_db and _valid_remote_db_url(remote_db):
     if remote_db.startswith("postgres://"):
         remote_db = remote_db.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = remote_db
+    active_db = remote_db
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:@localhost/pet_adoption"
+    if remote_db:
+        app.logger.warning(
+            'Invalid or unreachable DATABASE_URL detected; falling back to local MySQL. '
+            'Set a valid DATABASE_URL or remove it to use local development instead.'
+        )
+    active_db = "mysql+pymysql://root:@localhost/pet_adoption"
+    app.config['SQLALCHEMY_DATABASE_URI'] = active_db
 
+print(f"SQLALCHEMY_DATABASE_URI active: {active_db}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -72,14 +103,16 @@ app.config['UPLOAD_FOLDER'] = upload_dir
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
 
-db = SQLAlchemy(app)
-
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'office@petadopt.ph')
+
+mail = Mail(app)
+
+
 from datetime import datetime
 
 class User(db.Model):

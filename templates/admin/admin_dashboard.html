@@ -25,10 +25,10 @@
 
 <div class="row g-2 g-md-3 mb-4">
     {% set metrics = [
-        {'label': 'Residents', 'value': pets_count, 'color': '#3498db'},
-        {'label': 'Pending', 'value': pending_applications|length, 'color': '#f1c40f'},
-        {'label': 'Reserved', 'value': reserved_pets, 'color': '#2ecc71'},
-        {'label': 'Today', 'value': today_apps, 'color': '#e74c3c'}
+        {'label': 'Residents', 'value': pets_count, 'color_class': 'bar-blue'},
+        {'label': 'Pending', 'value': pending_applications|length, 'color_class': 'bar-yellow'},
+        {'label': 'Reserved', 'value': reserved_pets, 'color_class': 'bar-green'},
+        {'label': 'Today', 'value': today_apps, 'color_class': 'bar-red'}
     ] %}
     {% for metric in metrics %}
     <div class="col-6 col-md-3">
@@ -36,7 +36,7 @@
             <div class="card-body p-3">
                 <div class="d-flex justify-content-between align-items-start mb-1">
                     <div class="text-uppercase fw-bold text-muted ls-1" style="font-size: 0.6rem;">{{ metric.label }}</div>
-                    <div style="width: 4px; height: 12px; background: {{ metric.color }}; border-radius: 10px;"></div>
+                    <div class="metric-color-bar {{ metric.color_class }}"></div>
                 </div>
                 <h3 class="fw-bold mb-0" style="color: var(--primary-navy); font-size: 1.5rem;">{{ metric.value }}</h3>
             </div>
@@ -87,7 +87,8 @@
                                         <a href="{{ url_for('approve_application', app_id=app.id) }}" class="btn btn-sm btn-success">Approve</a>
                                         <button type="button" 
                                                 class="btn btn-sm btn-outline-danger" 
-                                                onclick="openDeclineModal('{{ url_for('decline_application', app_id=app.id) }}')">
+                                                data-decline-url="{{ url_for('decline_application', app_id=app.id) }}"
+                                                onclick="openDeclineModal(this.dataset.declineUrl)">
                                             Decline
                                         </button>
                                     </div>
@@ -104,7 +105,7 @@
                 <span class="small text-muted">{{ occupancy_percent|round|int }}%</span>
             </div>
             <div class="progress rounded-pill mb-2" style="height: 8px;">
-                <div class="progress-bar {% if occupancy_percent > 85 %}bg-danger{% else %}bg-navy{% endif %}" style="width: {{ occupancy_percent }}%"></div>
+                <div class="progress-bar {% if occupancy_percent > 85 %}bg-danger{% else %}bg-navy{% endif %}" data-width="{{ occupancy_percent }}"></div>
             </div>
             <small class="text-muted x-small italic">Recommended limit: 45 residents</small>
         </div>
@@ -141,6 +142,11 @@
     
     .hover-link:hover { color: var(--primary-navy) !important; font-weight: bold; }
     .btn-white { background-color: #fff; }
+    .metric-color-bar { width: 4px; height: 12px; border-radius: 10px; }
+    .bar-blue { background: #3498db; }
+    .bar-yellow { background: #f1c40f; }
+    .bar-green { background: #2ecc71; }
+    .bar-red { background: #e74c3c; }
 
     /* Fix for small screens to prevent long text from breaking layout */
     .text-dark { word-break: break-word; }
@@ -174,6 +180,12 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.progress-bar[data-width]').forEach(function (bar) {
+        bar.style.width = bar.dataset.width + '%';
+    });
+});
+
 function openDeclineModal(url) {
     // This tells the form inside the modal WHERE to send the data
     const form = document.getElementById('declineForm');

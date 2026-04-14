@@ -32,6 +32,9 @@
 
         }
 
+        .border-left-return { border-left: 3px solid #dc3545 !important; }
+        .border-left-claim { border-left: 3px solid #198754 !important; }
+
 
 
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dashboard); color: var(--text-main); line-height: 1.7; }
@@ -401,9 +404,10 @@
                 <div class="progress rounded-0" style="height: 12px;">
                     <div class="progress-bar {% if occupancy_percent > 80 %}bg-danger{% else %}bg-success{% endif %}" 
                          role="progressbar" 
-                         style="width: {{ occupancy_percent }}%" 
-                         aria-valuenow="{{ occupancy_percent }}" 
-                         aria-valuemin="0" 
+                         style="width: 0%;"
+                         data-width="{{ occupancy_percent }}"
+                         aria-valuenow="{{ occupancy_percent }}"
+                         aria-valuemin="0"
                          aria-valuemax="100"></div>
                 </div>
                 
@@ -816,7 +820,7 @@
                         </thead>
                         <tbody>
                             {% for app in scheduled_apps %}
-<tr style="border-left: 3px solid {% if app.status == 'Return Requested' %}#dc3545{% else %}#198754{% endif %};">
+<tr class="{% if app.status == 'Return Requested' %}border-left-return{% else %}border-left-claim{% endif %}">
     <td class="small fw-bold">
         {{ app.return_date.strftime('%b %d | %I:%M %p') if app.return_date else app.pickup_date.strftime('%b %d | %I:%M %p') }}
     </td>
@@ -994,6 +998,11 @@ function openDeclineModal(declineUrl) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.progress-bar[data-width]');
+    progressBars.forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+    });
+
     const dateInputs = document.querySelectorAll('input[type="datetime-local"]');
     
     const now = new Date();

@@ -450,14 +450,14 @@
                                 </h6>
                                 <div class="d-grid gap-2">
                                     {% if app.id_proof %}
-                                        <button type="button" onclick="openImageViewer('{{ url_for('static', filename='uploads/' + app.id_proof) }}')" class="btn btn-outline-dark rounded-0 w-100 text-start d-flex justify-content-between align-items-center bg-white" style="border-color: #dcdcdc;">
+                                        <button type="button" data-img-src="{{ url_for('static', filename='uploads/' + app.id_proof) }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-outline-dark rounded-0 w-100 text-start d-flex justify-content-between align-items-center bg-white" style="border-color: #dcdcdc;">
                                             <span class="small fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">View Government ID</span>
                                             <span class="text-muted">&rarr;</span>
                                         </button>
                                     {% endif %}
                                     
                                     {% if app.home_picture %}
-                                        <button type="button" onclick="openImageViewer('{{ url_for('static', filename='uploads/' + app.home_picture) }}')" class="btn btn-outline-dark rounded-0 w-100 text-start d-flex justify-content-between align-items-center bg-white mt-1" style="border-color: #dcdcdc;">
+                                        <button type="button" data-img-src="{{ url_for('static', filename='uploads/' + app.home_picture) }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-outline-dark rounded-0 w-100 text-start d-flex justify-content-between align-items-center bg-white mt-1" style="border-color: #dcdcdc;">
                                             <span class="small fw-bold text-dark text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">View Home Environment</span>
                                             <span class="text-muted">&rarr;</span>
                                         </button>

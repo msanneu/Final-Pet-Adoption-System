@@ -48,9 +48,9 @@
         
         {% if applications %}
             {% for app in applications %}
-            {# CLEAN FIX: Set the color in a variable first to avoid CSS validator errors #}
-            {% set border_color = '#198754' if app.status == 'Claimed' else '#dc3545' if app.status == 'Declined' else '#ffc107' if 'Return' in app.status else '#1a2a3a' %}
-            <div class="card p-3 p-md-4 border-0 shadow-sm mb-3" style="border-left: 5px solid {{ border_color }};">
+            {# CLEAN FIX: Use a status-specific CSS class instead of inline Jinja CSS #}
+            {% set status_border_class = 'border-left-success' if app.status == 'Claimed' else 'border-left-danger' if app.status == 'Declined' else 'border-left-warning' if 'Return' in app.status else 'border-left-dark' %}
+                <div class="card p-3 p-md-4 border-0 shadow-sm mb-3 {{ status_border_class }}">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mb-3 gap-2">
                     <div>
                         <h6 class="fw-bold mb-0">APP-{{ app.id }}</h6>
@@ -118,13 +118,12 @@
                             <h6 class="small fw-bold text-uppercase border-bottom pb-2 text-navy">Attached Documents</h6>
                             <div class="d-grid d-sm-flex gap-2 mt-2">
                                 {% if app.id_proof %}
-                                    <button type="button" onclick="openImageViewer('{{ url_for('static', filename='uploads/' + app.id_proof) }}')" class="btn btn-sm btn-gold-outline w-100">
-                                        View Government ID
+                                    <button type="button" data-img-src="{{ url_for('static', filename='uploads/' + app.id_proof) }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-sm btn-gold-outline w-100">
+                                    View Government ID
                                     </button>
                                 {% endif %}
                                 {% if app.home_picture %}
-                                    <button type="button" onclick="openImageViewer('{{ url_for('static', filename='uploads/' + app.home_picture) }}')" class="btn btn-sm btn-gold-outline w-100">
-                                        View Home Picture
+                                    <button type="button" data-img-src="{{ url_for('static', filename='uploads/' + app.home_picture) }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-sm btn-gold-outline w-100">                                        View Home Picture
                                     </button>
                                 {% endif %}
                             </div>
@@ -170,6 +169,11 @@ function openImageViewer(imageSrc) {
     .btn-gold-outline { border: 1px solid #c5a059; color: #c5a059; background: transparent; font-weight: 600; border-radius: 20px; transition: 0.3s; }
     .btn-gold-outline:hover { background: #c5a059; color: white; }
     .text-break { word-wrap: break-word !important; }
+
+    .border-left-success { border-left: 5px solid #198754 !important; }
+    .border-left-danger { border-left: 5px solid #dc3545 !important; }
+    .border-left-warning { border-left: 5px solid #ffc107 !important; }
+    .border-left-dark { border-left: 5px solid #1a2a3a !important; }
     
     @media (max-width: 576px) {
         .modal-fullscreen-sm-down .modal-content { height: 100vh; border-radius: 0; }

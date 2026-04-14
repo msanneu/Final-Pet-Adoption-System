@@ -22,16 +22,16 @@
             body { background-color: white !important; padding: 0; }
             .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
             .card { border: none !important; box-shadow: none !important; padding: 0 !important; }
-            .table th { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; }
-            .d-print-block { display: block !important; }
+/* Corrected */
+.table th { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }            .d-print-block { display: block !important; }
         }
 
         /* Mobile specific adjustments */
         @media (max-width: 768px) {
             .report-card { padding: 1.5rem !important; }
             .report-header { flex-direction: column; align-items: flex-start !important; text-align: left; }
-            .report-header .text-end { text-align: left !important; margin-top: 15px; width: 100%; border-top: 1px solid #eee; pt-2; }
-            .display-mobile-stack { flex-direction: column; }
+/* Corrected */
+.report-header .text-end { text-align: left !important; margin-top: 15px; width: 100%; border-top: 1px solid #eee; padding-top: 0.5rem; }            .display-mobile-stack { flex-direction: column; }
             h1 { font-size: 1.5rem; }
         }
     </style>
