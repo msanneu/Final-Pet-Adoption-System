@@ -33,8 +33,8 @@ load_dotenv()
 api_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Since 'templates' and 'static' are now inside 'api' on GitHub:
-template_dir = os.path.join(api_dir, 'templates')
-static_dir = os.path.join(api_dir, 'static')
+template_dir = os.path.join(api_dir, '..', 'templates')
+static_dir = os.path.join(api_dir, '..', 'static')
 
 app = Flask(__name__, 
             template_folder=template_dir, 
