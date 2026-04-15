@@ -28,10 +28,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# This gets the absolute physical path to the 'api' folder (/var/task/api)
+# Use realpath to get the absolute path of the 'api' folder
 api_dir = os.path.dirname(os.path.realpath(__file__))
 
-# Since you moved templates and static INSIDE /api, point directly to them
+# Define absolute paths to the folders you moved inside 'api'
 template_dir = os.path.join(api_dir, 'templates')
 static_dir = os.path.join(api_dir, 'static')
 
@@ -39,10 +39,8 @@ app = Flask(__name__,
             template_folder=template_dir, 
             static_folder=static_dir)
 
-# VERCEL DEBUG LOGS: Check these in your dashboard after pushing
-print(f"VERCEL PATH: {api_dir}")
-print(f"TEMPLATE PATH: {template_dir}")
-print(f"FILE CHECK (index.html): {os.path.exists(os.path.join(template_dir, 'public/index.html'))}")
+# VERCEL DEBUG LOG: This will confirm if the file is physically reachable
+print(f"VERCEL PATH CHECK: {os.path.exists(os.path.join(template_dir, 'public/index.html'))}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
