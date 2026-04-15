@@ -69,16 +69,14 @@ CREATE TABLE `adoption_application` (
   `application_date` datetime DEFAULT NULL,
   `approval_date` datetime DEFAULT NULL,
   `pickup_date` datetime DEFAULT NULL,
-  `claim_date` datetime DEFAULT NULL,
-  `return_request_date` datetime DEFAULT NULL,
-  `return_date` datetime DEFAULT NULL
+  `claim_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `adoption_application`
 --
 
-INSERT INTO `adoption_application` (`id`, `user_id`, `adopter_name`, `email`, `id_proof`, `status`, `phone`, `occupation`, `q_home_type`, `q_yard_access`, `household_size`, `q_hours_alone`, `other_pets`, `surrendered_pet`, `q_pet_experience`, `financial_readiness`, `home_picture`, `application_date`, `approval_date`, `pickup_date`, `claim_date`, `return_request_date`, `return_date`) VALUES
+INSERT INTO `adoption_application` (`id`, `user_id`, `adopter_name`, `email`, `id_proof`, `status`, `phone`, `occupation`, `q_home_type`, `q_yard_access`, `household_size`, `q_hours_alone`, `other_pets`, `surrendered_pet`, `q_pet_experience`, `financial_readiness`, `home_picture`, `application_date`, `approval_date`, `pickup_date`, `claim_date`) VALUES
 (1, NULL, 'patricia ann sambilay', 'sambilay.patriciaann@gmail.com', '1189d31da0fe45f2b6a3ddace0c4abba.png', 'Approved', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-09 09:39:42', '2026-03-09 21:51:58', NULL, NULL, NULL, NULL),
 (2, NULL, 'Patricia Ann Sambilay', 'sambilay.patriciaann@gmail.com', '56f5c8ed6a554e449a5cbf79f2bf7e2c.png', 'Declined', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-09 10:11:20', NULL, NULL, NULL, NULL, NULL),
 (3, NULL, 'dwdw', 'sambilay.patriciaann@gmail.com', '5fb1c9f873b04b8ea5b6cdfb4c8bb1e0.png', 'Declined', 'dwda', 'dwd', 'fwf', 'No Yard/Balcony', '2-3 People', '0-4 hours', 'None', 'No', 'wd', 'Prepared for routine and emergency care', '96cb53aa50ab40db994c71869d792811.png', '2026-03-09 10:15:29', NULL, NULL, NULL, NULL, NULL),

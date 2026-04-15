@@ -12,7 +12,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from sqlalchemy import select
+from sqlalchemy import select, create_engine, inspect, text
+from sqlalchemy.exc import OperationalError
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv 
 from supabase import create_client
@@ -48,11 +49,25 @@ def _valid_remote_db_url(url):
         return False
     try:
         socket.getaddrinfo(host, parsed.port or 5432)
-        return True
     except OSError:
         return False
 
+    try:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        engine = create_engine(url, connect_args={"connect_timeout": 5}, pool_pre_ping=True)
+        with engine.connect() as conn:
+            pass
+        engine.dispose()
+        return True
+    except Exception:
+        return False
+
 remote_db = os.environ.get('DATABASE_URL', '').strip()
+local_sqlite_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance', 'pet_adoption.db'))
+os.makedirs(os.path.dirname(local_sqlite_path), exist_ok=True)
+local_sqlite_uri = f"sqlite:///{local_sqlite_path}"
+
 if remote_db and _valid_remote_db_url(remote_db):
     if remote_db.startswith("postgres://"):
         remote_db = remote_db.replace("postgres://", "postgresql://", 1)
@@ -61,10 +76,10 @@ if remote_db and _valid_remote_db_url(remote_db):
 else:
     if remote_db:
         app.logger.warning(
-            'Invalid or unreachable DATABASE_URL detected; falling back to local MySQL. '
+            'Invalid or unreachable DATABASE_URL detected; falling back to local SQLite. '
             'Set a valid DATABASE_URL or remove it to use local development instead.'
         )
-    active_db = "mysql+pymysql://root:@localhost/pet_adoption"
+    active_db = local_sqlite_uri
     app.config['SQLALCHEMY_DATABASE_URI'] = active_db
 
 print(f"SQLALCHEMY_DATABASE_URI active: {active_db}")
@@ -238,8 +253,35 @@ def is_valid_username(u, max_len=50):
 def is_strong_password(p, min_len=8):
     return p and len(p) >= min_len
 
+def _ensure_sqlite_schema():
+    if not app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite:///'):
+        return
+
+    inspector = inspect(db.engine)
+    models = [User, Pet, AdoptionApplication, ApplicationItem, AdminUser, AuditLog]
+
+    for model in models:
+        table_name = model.__tablename__
+        if not inspector.has_table(table_name):
+            continue
+
+        existing_columns = {col['name'] for col in inspector.get_columns(table_name)}
+        for column in model.__table__.columns:
+            if column.name in existing_columns:
+                continue
+
+            column_type = column.type.compile(db.engine.dialect)
+            ddl = f'ALTER TABLE "{table_name}" ADD COLUMN "{column.name}" {column_type}'
+            try:
+                db.session.execute(text(ddl))
+            except OperationalError:
+                app.logger.warning(f"Could not add SQLite column {column.name} to {table_name}; skipping.")
+
+    db.session.commit()
+
 with app.app_context():
-    db.create_all() 
+    db.create_all()
+    _ensure_sqlite_schema()
     admin_exists = db.session.execute(select(AdminUser).filter_by(username="admin")).scalar()
     if not admin_exists:
         db.session.add(AdminUser(
@@ -1301,6 +1343,25 @@ def reset_password(token):
         return redirect(url_for('adopter_login'))
         
     return render_template('adopter/adopter_auth.html', mode='reset', token=token)
+
+    @app.route('/setup-admin-9911') # You can change 9911 to any secret number
+    def setup_admin():
+        try:
+            # Check if an admin already exists
+            admin_exists = Admin.query.filter_by(username='admin').first()
+            if admin_exists:
+                return "Admin already exists in Supabase!"
+
+            # Create the new admin
+            new_admin = Admin(
+                username='admin',
+                password_hash=generate_password_hash('password123') # This will be your password
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            return "Admin account 'admin' with password 'password123' created successfully in Supabase!"
+        except Exception as e:
+            return f"Error: {str(e)}"
 
 if __name__ == '__main__':  
     app.run(debug=True)
