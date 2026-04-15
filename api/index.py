@@ -31,21 +31,23 @@ load_dotenv()
 # This gets the path to the 'api' folder (/var/task/api)
 api_dir = os.path.dirname(os.path.abspath(__file__))
 
-# This points to the /api folder
-current_dir = os.path.dirname(os.path.abspath(__file__))
+# This gets the 'api' folder path (/var/task/api)
+api_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Templates and static are now children of /api
-template_dir = os.path.join(current_dir, 'templates')
-static_dir = os.path.join(current_dir, 'static')
+# Move UP to the root directory where templates/static now live (/var/task)
+root_dir = os.path.dirname(api_dir)
+
+template_dir = os.path.join(root_dir, 'templates')
+static_dir = os.path.join(root_dir, 'static')
 
 app = Flask(__name__, 
             template_folder=template_dir, 
             static_folder=static_dir)
 
-# VERCEL DEBUG: Let's see if the file is physically there
-check_path = os.path.join(template_dir, 'public/index.html')
-print(f"VERCEL DEBUG: Checking for index at: {check_path}")
-print(f"VERCEL DEBUG: Found? {os.path.exists(check_path)}")
+# VERCEL DEBUG LOG: This will confirm if the file is physically reachable
+check_file = os.path.join(template_dir, 'public/index.html')
+print(f"VERCEL DEBUG: Checking for index.html at {check_file}")
+print(f"VERCEL DEBUG: Found? {os.path.exists(check_file)}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
