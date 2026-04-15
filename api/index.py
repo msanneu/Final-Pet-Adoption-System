@@ -28,13 +28,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# This gets the path to the 'api' folder (/var/task/api)
+# This is /var/task/api
 api_dir = os.path.dirname(os.path.abspath(__file__))
 
-# This gets the 'api' folder path (/var/task/api)
-api_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Move UP to the root directory where templates/static now live (/var/task)
+# This moves UP to the root /var/task where templates/static live
 root_dir = os.path.dirname(api_dir)
 
 template_dir = os.path.join(root_dir, 'templates')
@@ -44,10 +41,9 @@ app = Flask(__name__,
             template_folder=template_dir, 
             static_folder=static_dir)
 
-# VERCEL DEBUG LOG: This will confirm if the file is physically reachable
-check_file = os.path.join(template_dir, 'public/index.html')
-print(f"VERCEL DEBUG: Checking for index.html at {check_file}")
-print(f"VERCEL DEBUG: Found? {os.path.exists(check_file)}")
+# VERCEL DEBUG LOGS: These will confirm the fix in your dashboard
+print(f"DEBUG: Root Directory is {root_dir}")
+print(f"DEBUG: Looking for index.html at {os.path.join(template_dir, 'public/index.html')}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
