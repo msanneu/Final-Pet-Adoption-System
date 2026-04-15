@@ -31,22 +31,21 @@ load_dotenv()
 # This gets the path to the 'api' folder (/var/task/api)
 api_dir = os.path.dirname(os.path.abspath(__file__))
 
-# This moves UP one level to the root directory (/var/task)
-root_dir = os.path.dirname(api_dir)
+# This points to the /api folder
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Define paths pointing to the folders OUTSIDE 'api'
-template_dir = os.path.join(root_dir, 'templates')
-static_dir = os.path.join(root_dir, 'static')
+# Templates and static are now children of /api
+template_dir = os.path.join(current_dir, 'templates')
+static_dir = os.path.join(current_dir, 'static')
 
 app = Flask(__name__, 
             template_folder=template_dir, 
             static_folder=static_dir)
 
-# --- VERCEL LOG VALIDATION ---
-# Check your Vercel logs for these lines to confirm it works
-print(f"VERCEL DEBUG: Root Dir is {root_dir}")
-target_html = os.path.join(template_dir, 'public/index.html')
-print(f"VERCEL DEBUG: index.html visible? {'YES' if os.path.exists(target_html) else 'NO'}")
+# VERCEL DEBUG: Let's see if the file is physically there
+check_path = os.path.join(template_dir, 'public/index.html')
+print(f"VERCEL DEBUG: Checking for index at: {check_path}")
+print(f"VERCEL DEBUG: Found? {os.path.exists(check_path)}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
