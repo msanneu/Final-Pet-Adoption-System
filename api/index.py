@@ -28,22 +28,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# --- VERCEL PATH LOGIC ---
-# This script is at /var/task/api/index.py
-# We need to go up one level to /var/task/ to find templates and static
-api_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(api_dir)
-
-# Define exact absolute paths
-template_dir = os.path.join(root_dir, 'templates')
-static_dir = os.path.join(root_dir, 'static')
+# Since folders are now inside /api with index.py
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, 'templates')
+static_dir = os.path.join(current_dir, 'static')
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-
-# DEBUG: This will help us verify the path in Vercel Logs
-print(f"DEBUG: Root Dir is {root_dir}")
-print(f"DEBUG: Looking for index.html at {os.path.join(template_dir, 'public/index.html')}")
-
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
 
