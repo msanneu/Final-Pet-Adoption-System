@@ -22,24 +22,27 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-api_folder = os.path.dirname(os.path.abspath(__file__))
+import os
+from flask import Flask
+from dotenv import load_dotenv
 
-# This moves up to the Project Root (where /templates and /static live)
-project_root = os.path.dirname(api_folder)
+load_dotenv()
 
-# Define full paths
-template_dir = os.path.join(project_root, 'templates')
-static_dir = os.path.join(project_root, 'static')
+# --- VERCEL PATH LOGIC ---
+# This script is at /var/task/api/index.py
+# We need to go up one level to /var/task/ to find templates and static
+api_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(api_dir)
 
-# Initialize Flask with absolute paths
-app = Flask(__name__, 
-            template_folder=template_dir, 
-            static_folder=static_dir)
+# Define exact absolute paths
+template_dir = os.path.join(root_dir, 'templates')
+static_dir = os.path.join(root_dir, 'static')
 
-# Debug prints (These will show in your Vercel Runtime Logs)
-print(f"DEBUG: API Folder: {api_folder}")
-print(f"DEBUG: Project Root: {project_root}")
-print(f"DEBUG: Looking for index.html at: {os.path.join(template_dir, 'public/index.html')}")
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+
+# DEBUG: This will help us verify the path in Vercel Logs
+print(f"DEBUG: Root Dir is {root_dir}")
+print(f"DEBUG: Looking for index.html at {os.path.join(template_dir, 'public/index.html')}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
