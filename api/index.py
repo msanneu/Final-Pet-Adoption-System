@@ -21,8 +21,10 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
-static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
+current_dir = os.path.dirname(__file__)
+template_dir = os.path.join(current_dir, '..', 'templates')
+static_dir = os.path.join(current_dir, '..', 'static')
+
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
