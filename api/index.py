@@ -22,21 +22,24 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-# --- ROBUST VERCEL PATH LOGIC ---
-# This looks for the directory containing the 'api' folder
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+api_folder = os.path.dirname(os.path.abspath(__file__))
 
-# Explicitly join the paths
-template_dir = os.path.join(base_dir, 'templates')
-static_dir = os.path.join(base_dir, 'static')
+# This moves up to the Project Root (where /templates and /static live)
+project_root = os.path.dirname(api_folder)
 
-# Add debug prints to your Vercel logs so we can see where it's looking
-print(f"DEBUG: Looking for templates in: {template_dir}")
-print(f"DEBUG: Looking for static in: {static_dir}")
+# Define full paths
+template_dir = os.path.join(project_root, 'templates')
+static_dir = os.path.join(project_root, 'static')
 
+# Initialize Flask with absolute paths
 app = Flask(__name__, 
             template_folder=template_dir, 
             static_folder=static_dir)
+
+# Debug prints (These will show in your Vercel Runtime Logs)
+print(f"DEBUG: API Folder: {api_folder}")
+print(f"DEBUG: Project Root: {project_root}")
+print(f"DEBUG: Looking for index.html at: {os.path.join(template_dir, 'public/index.html')}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
