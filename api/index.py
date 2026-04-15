@@ -1351,6 +1351,11 @@ def reset_password(token):
         
     return render_template('adopter/adopter_auth.html', mode='reset', token=token)
 
+@app.route('/favicon.png')
+@app.route('/favicon.ico')
+def favicon():
+    return redirect(url_for('static', filename='images/icon-192.png'))
+
     # --- CLEAN & FIXED SETUP ROUTE ---
 @app.route('/setup-admin-9911')
 def setup_admin():
