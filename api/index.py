@@ -20,17 +20,18 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-# 1. Get the absolute path of the 'api' folder where this file lives
-api_dir = os.path.dirname(os.path.abspath(__file__))
+# 1. Get the absolute path of the 'api' folder where index.py lives
+api_folder_path = os.path.dirname(os.path.abspath(__file__))
 
-# 2. Get the project root folder (one level up from 'api')
-project_root = os.path.dirname(api_dir)
+# 2. Get the Project Root (one level up from 'api')
+# This is where your 'templates' and 'static' folders are actually located
+project_root = os.path.dirname(api_folder_path)
 
-# 3. Define the exact locations of templates and static files
+# 3. Define the explicit paths
 template_dir = os.path.join(project_root, 'templates')
 static_dir = os.path.join(project_root, 'static')
 
-# 4. Initialize Flask with these explicit paths
+# 4. Initialize Flask with these specific locations
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
