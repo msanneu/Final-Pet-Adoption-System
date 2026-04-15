@@ -1,3 +1,5 @@
+# Deployment Fix Ver 1.10 - Adjusted file paths and upload handling for Vercel compatibility. Added environment variable checks for database configuration. Updated comments for clarity.
+
 import os
 import re
 import csv
