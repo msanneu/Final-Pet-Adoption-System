@@ -293,17 +293,6 @@ def _ensure_sqlite_schema():
 
     db.session.commit()
 
-with app.app_context():
-    _ensure_sqlite_schema()
-    admin_exists = db.session.execute(select(AdminUser).filter_by(username="admin")).scalar()
-    if not admin_exists:
-        db.session.add(AdminUser(
-            username="admin", 
-            password_hash=generate_password_hash("password123"), 
-            force_password_change=True, 
-            is_default=True
-        ))
-        db.session.commit()
 
 @app.route('/')
 def index():
@@ -1357,26 +1346,27 @@ def reset_password(token):
         
     return render_template('adopter/adopter_auth.html', mode='reset', token=token)
 
-    @app.route('/setup-admin-9911') # You can change 9911 to any secret number
-    def setup_admin():
-        try:
-
-            db.create_all()
-            # Check if an admin already exists
-            admin_exists = Admin.query.filter_by(username='admin').first()
-            if admin_exists:
-                return "Admin already exists in Supabase!"
-
-            # Create the new admin
-            new_admin = Admin(
+    # --- CLEAN & FIXED SETUP ROUTE ---
+@app.route('/setup-admin-9911')
+def setup_admin():
+    try:
+        # 1. Force the creation of tables in Supabase
+        db.create_all()
+        
+        # 2. Use the correct model name 'AdminUser'
+        admin_exists = AdminUser.query.filter_by(username='admin').first()
+        if not admin_exists:
+            new_admin = AdminUser(
                 username='admin',
-                password_hash=generate_password_hash('password123') # This will be your password
+                password_hash=generate_password_hash('password123'),
+                is_default=True
             )
             db.session.add(new_admin)
             db.session.commit()
-            return "Admin account 'admin' with password 'password123' created successfully in Supabase!"
-        except Exception as e:
-            return f"Error: {str(e)}"
+            return "SUCCESS: Supabase tables created and admin ready!"
+        return "SUCCESS: Tables already exist."
+    except Exception as e:
+        return f"Database Error: {str(e)}"
         
         @app.route('/setup-db-init')
         def setup_db_init():
