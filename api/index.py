@@ -1386,6 +1386,26 @@ def reset_password(token):
             return "Admin account 'admin' with password 'password123' created successfully in Supabase!"
         except Exception as e:
             return f"Error: {str(e)}"
+        
+        @app.route('/setup-db-init')
+        def setup_db_init():
+            try:
+                # This command forces SQLAlchemy to create the tables in Supabase
+                db.create_all()
+                
+                # Check for admin
+                admin = Admin.query.filter_by(username='admin').first()
+                if not admin:
+                    new_admin = Admin(
+                        username='admin',
+                        password_hash=generate_password_hash('password123')
+                    )
+                    db.session.add(new_admin)
+                    db.session.commit()
+                    return "SUCCESS: Supabase tables created and admin account ready!"
+                return "SUCCESS: Tables already exist."
+            except Exception as e:
+                return f"Database Error: {str(e)}"
 
 if __name__ == '__main__':  
     app.run(debug=True)
