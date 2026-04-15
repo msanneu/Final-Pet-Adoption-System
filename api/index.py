@@ -114,8 +114,11 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'},
 )
 
-upload_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static', 'uploads')
-os.makedirs(upload_dir, exist_ok=True)
+upload_dir = os.path.join(static_dir, 'uploads')
+
+# Only create the uploads directory if we are NOT on Vercel
+if not os.environ.get('VERCEL'):
+    os.makedirs(upload_dir, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = upload_dir
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
