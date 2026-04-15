@@ -28,22 +28,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Since templates are now inside the SAME folder as index.py
-# current_dir will be '/var/task/api'
+# This gets the exact folder where index.py is (which is /api)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Point directly to the folders inside 'api'
+# Since you moved templates/static INSIDE /api, they are sibling folders
 template_dir = os.path.join(current_dir, 'templates')
 static_dir = os.path.join(current_dir, 'static')
 
-app = Flask(__name__, 
-            template_folder=template_dir, 
-            static_folder=static_dir)
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
-# FINAL DEBUG CHECK - Look for these in your Vercel logs
-print(f"VERCEL DEBUG: Current Dir: {current_dir}")
-print(f"VERCEL DEBUG: Template Dir: {template_dir}")
-print(f"VERCEL DEBUG: File exists? {os.path.exists(os.path.join(template_dir, 'public/index.html'))}")
+# --- DEBUGGING PRINTS FOR VERCEL LOGS ---
+# This will tell us if the folder exists and what its name is
+if os.path.exists(template_dir):
+    print(f"VERCEL SUCCESS: Templates folder found. Contents: {os.listdir(template_dir)}")
+else:
+    print(f"VERCEL ERROR: Templates folder NOT FOUND at {template_dir}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
