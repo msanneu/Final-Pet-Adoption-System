@@ -64,27 +64,27 @@ def _valid_remote_db_url(url):
         return True
     except Exception:
         return False
+# --- CLOUD-SAFE DATABASE CONFIGURATION ---
+database_url = os.environ.get("DATABASE_URL")
 
-remote_db = os.environ.get('DATABASE_URL', '').strip()
-local_sqlite_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance', 'pet_adoption.db'))
-os.makedirs(os.path.dirname(local_sqlite_path), exist_ok=True)
-local_sqlite_uri = f"sqlite:///{local_sqlite_path}"
-
-if remote_db and _valid_remote_db_url(remote_db):
-    if remote_db.startswith("postgres://"):
-        remote_db = remote_db.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = remote_db
-    active_db = remote_db
+if database_url:
+    # Fix for SQLAlchemy: convert 'postgres://' to 'postgresql://'
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    active_db = "SUPABASE (REMOTE)"
 else:
-    if remote_db:
-        app.logger.warning(
-            'Invalid or unreachable DATABASE_URL detected; falling back to local SQLite. '
-            'Set a valid DATABASE_URL or remove it to use local development instead.'
-        )
-    active_db = local_sqlite_uri
-    app.config['SQLALCHEMY_DATABASE_URI'] = active_db
+    # Use local SQLite path
+    local_sqlite_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'pet_adoption.db')
+    
+    # CRITICAL: Only create the directory if we are NOT on Vercel
+    if not os.environ.get('VERCEL'):
+        os.makedirs(os.path.dirname(local_sqlite_path), exist_ok=True)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{local_sqlite_path}"
+    active_db = "SQLITE (LOCAL)"
 
-print(f"SQLALCHEMY_DATABASE_URI active: {active_db}")
+print(f"--- SYSTEM ACTIVE DB: {active_db} ---")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
