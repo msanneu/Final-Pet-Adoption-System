@@ -101,12 +101,6 @@ def save_upload(file):
     if not supabase:
         return None, "Supabase client not initialized."
 
-if supabase_url and supabase_key:
-    supabase_client = create_client(supabase_url, supabase_key)
-
-
-
-
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
