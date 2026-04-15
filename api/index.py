@@ -113,12 +113,13 @@ google = oauth.register(
     userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
     client_kwargs={'scope': 'openid email profile'},
 )
-
+# --- VERCEL-SAFE UPLOAD DIRECTORY ---
 upload_dir = os.path.join(static_dir, 'uploads')
 
-# Only create the uploads directory if we are NOT on Vercel
+# Only try to create the directory if we are NOT on Vercel
 if not os.environ.get('VERCEL'):
-    os.makedirs(upload_dir, exist_ok=True)
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = upload_dir
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
