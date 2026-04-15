@@ -28,21 +28,28 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# This gets the absolute path of 'index.py' ON THE VERCEL SERVER
-# It will look like: /var/task/api
-api_dir = os.path.dirname(os.path.realpath(__file__))
+# 1. Try to get the path relative to this script
+current_dir = os.path.dirname(os.path.realpath(__file__))
 
-# Since 'templates' and 'static' are now inside 'api' on GitHub:
-template_dir = os.path.join(api_dir, '..', 'templates')
-static_dir = os.path.join(api_dir, '..', 'static')
+# 2. Define the template folder path
+template_dir = os.path.join(current_dir, 'templates')
+
+# 3. CRITICAL FALLBACK: If it still can't find it, look for the 'api/templates' version
+if not os.path.exists(os.path.join(template_dir, 'public/index.html')):
+    # Try looking in /var/task/templates if /var/task/api/templates failed
+    template_dir = os.path.join(os.path.dirname(current_dir), 'templates')
+
+static_dir = os.path.join(os.path.dirname(template_dir), 'static')
 
 app = Flask(__name__, 
             template_folder=template_dir, 
             static_folder=static_dir)
 
-# --- VERCEL LOG VALIDATION ---
-# This will show 'True' in your Vercel logs if it found your GitHub files
-print(f"GITHUB PATH CHECK: {os.path.exists(os.path.join(template_dir, 'public/index.html'))}")
+# --- NEW VERCEL LOG VALIDATION ---
+# Check these in your dashboard after pushing
+target = os.path.join(template_dir, 'public/index.html')
+print(f"VERCEL DEBUG: Using template folder: {template_dir}")
+print(f"VERCEL DEBUG: Is index.html visible? {'YES' if os.path.exists(target) else 'NO'}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
