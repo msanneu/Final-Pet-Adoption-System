@@ -28,9 +28,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
-static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
-app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+# This gets the absolute path of 'index.py' ON THE VERCEL SERVER
+# It will look like: /var/task/api
+api_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Since 'templates' and 'static' are now inside 'api' on GitHub:
+template_dir = os.path.join(api_dir, 'templates')
+static_dir = os.path.join(api_dir, 'static')
+
+app = Flask(__name__, 
+            template_folder=template_dir, 
+            static_folder=static_dir)
+
+# --- VERCEL LOG VALIDATION ---
+# This will show 'True' in your Vercel logs if it found your GitHub files
+print(f"GITHUB PATH CHECK: {os.path.exists(os.path.join(template_dir, 'public/index.html'))}")
+
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
 
