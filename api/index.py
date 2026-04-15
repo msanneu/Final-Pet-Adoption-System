@@ -28,25 +28,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# This gets the path to the 'api' folder where index.py lives (/var/task/api)
-current_dir = os.path.dirname(os.path.abspath(__file__))
+# --- VERCEL ABSOLUTE PATH FIX ---
+# This points directly to the 'api' folder where your code and templates now live together
+api_path = os.path.dirname(os.path.realpath(__file__))
 
-# Since 'templates' is now a folder INSIDE 'api', we point directly to it
-template_dir = os.path.join(current_dir, 'templates')
-
-# Static is still likely at the root, so we go up one level for it
-# If you moved 'static' into 'api' as well, change this to: os.path.join(current_dir, 'static')
-static_dir = os.path.join(os.path.dirname(current_dir), 'static')
+# We define the paths relative to 'api_path'
+template_dir = os.path.join(api_path, 'templates')
+static_dir = os.path.join(api_path, 'static')
 
 app = Flask(__name__, 
             template_folder=template_dir, 
             static_folder=static_dir)
 
-# --- VERCEL DEBUG LOGS ---
-# These will show up in your Vercel Dashboard to confirm the paths
-print(f"DEBUG: index.py location: {current_dir}")
-print(f"DEBUG: Looking for templates in: {template_dir}")
-print(f"DEBUG: index.html found? {os.path.exists(os.path.join(template_dir, 'public/index.html'))}")
+# FINAL DEBUG: Let's see exactly what the server sees in that folder
+if os.path.exists(template_dir):
+    print(f"VERCEL CHECK: Templates folder found! Contents: {os.listdir(template_dir)}")
+else:
+    print(f"VERCEL CHECK: ERROR - Templates folder not found at {template_dir}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
@@ -1376,25 +1374,30 @@ def setup_admin():
     except Exception as e:
         return f"Database Error: {str(e)}"
         
-        @app.route('/setup-db-init')
-        def setup_db_init():
-            try:
-                # This command forces SQLAlchemy to create the tables in Supabase
-                db.create_all()
-                
-                # Check for admin
-                admin = Admin.query.filter_by(username='admin').first()
-                if not admin:
-                    new_admin = Admin(
-                        username='admin',
-                        password_hash=generate_password_hash('password123')
-                    )
-                    db.session.add(new_admin)
-                    db.session.commit()
-                    return "SUCCESS: Supabase tables created and admin account ready!"
-                return "SUCCESS: Tables already exist."
-            except Exception as e:
-                return f"Database Error: {str(e)}"
+@app.route('/setup-db-init')
+def setup_db_init():
+    try:
+        # Create all tables defined in models
+        db.create_all()
+        
+        # Check if admin already exists to prevent duplicates
+        admin = AdminUser.query.filter_by(username='admin').first()
+        
+        if not admin:
+            new_admin = AdminUser(
+                username='admin',
+                password_hash=generate_password_hash('password123')
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            return "SUCCESS: Supabase tables created and admin account ready!"
+        
+        return "SUCCESS: Tables already exist and admin is already set up."
+
+    except Exception as e:
+        # It's good practice to roll back the session if an error occurs during commit
+        db.session.rollback()
+        return f"Database Error: {str(e)}"
 
 if __name__ == '__main__':  
     app.run(debug=True)
