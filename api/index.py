@@ -28,22 +28,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# This is /var/task/api
+# This gets the path to the 'api' folder (/var/task/api)
 api_dir = os.path.dirname(os.path.abspath(__file__))
 
-# This moves UP to the root /var/task where templates/static live
+# This moves UP one level to the root directory (/var/task)
 root_dir = os.path.dirname(api_dir)
 
+# Define paths pointing to the folders OUTSIDE 'api'
 template_dir = os.path.join(root_dir, 'templates')
 static_dir = os.path.join(root_dir, 'static')
 
 app = Flask(__name__, 
-            template_folder=os.path.join(root_dir, 'templates'), 
+            template_folder=template_dir, 
             static_folder=static_dir)
 
-# VERCEL DEBUG LOGS: These will confirm the fix in your dashboard
-print(f"DEBUG: Root Directory is {root_dir}")
-print(f"DEBUG: Looking for index.html at {os.path.join(template_dir, 'public/index.html')}")
+# --- VERCEL LOG VALIDATION ---
+# Check your Vercel logs for these lines to confirm it works
+print(f"VERCEL DEBUG: Root Dir is {root_dir}")
+target_html = os.path.join(template_dir, 'public/index.html')
+print(f"VERCEL DEBUG: index.html visible? {'YES' if os.path.exists(target_html) else 'NO'}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
@@ -1350,11 +1353,6 @@ def reset_password(token):
         return redirect(url_for('adopter_login'))
         
     return render_template('adopter/adopter_auth.html', mode='reset', token=token)
-
-@app.route('/favicon.png')
-@app.route('/favicon.ico')
-def favicon():
-    return redirect(url_for('static', filename='images/icon-192.png'))
 
     # --- CLEAN & FIXED SETUP ROUTE ---
 @app.route('/setup-admin-9911')
