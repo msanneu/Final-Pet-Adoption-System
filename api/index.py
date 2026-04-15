@@ -304,7 +304,6 @@ def _ensure_sqlite_schema():
     db.session.commit()
 
 with app.app_context():
-    db.create_all()
     _ensure_sqlite_schema()
     admin_exists = db.session.execute(select(AdminUser).filter_by(username="admin")).scalar()
     if not admin_exists:
@@ -1371,6 +1370,8 @@ def reset_password(token):
     @app.route('/setup-admin-9911') # You can change 9911 to any secret number
     def setup_admin():
         try:
+
+            db.create_all()
             # Check if an admin already exists
             admin_exists = Admin.query.filter_by(username='admin').first()
             if admin_exists:
