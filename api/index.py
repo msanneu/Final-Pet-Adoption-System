@@ -45,7 +45,7 @@ app = Flask(__name__,
 # --- VERCEL LOG VALIDATION ---
 # Check your Vercel logs for these lines to confirm it works
 print(f"VERCEL DEBUG: Root Dir is {root_dir}")
-target_html = os.path.join(template_dir, 'public/index.html')
+target_html = os.path.join(template_dir, 'index.html')
 print(f"VERCEL DEBUG: index.html visible? {'YES' if os.path.exists(target_html) else 'NO'}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
@@ -304,7 +304,7 @@ def _ensure_sqlite_schema():
 
 @app.route('/')
 def index():
-    return render_template('public/index.html', pets=Pet.query.filter_by(status="Available").all())
+    return render_template('index.html', pets=Pet.query.filter_by(status="Available").all())
 
 @app.route('/adopt/<int:pet_id>', methods=['GET', 'POST'])
 def adopt(pet_id):
