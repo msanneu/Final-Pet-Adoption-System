@@ -20,9 +20,11 @@
             position: fixed; 
             background: var(--primary-navy); 
             color: white; 
-            padding-top: 30px; 
-            z-index: 1000;
+            padding-top: 60px; 
+            /* Set z-index higher than mobile-navbar (which is 1001) */
+            z-index: 1050 !important; 
             transition: all 0.3s;
+            left: -260px; /* Default hidden for mobile */
         }
 
         .main-content { 
@@ -34,25 +36,37 @@
 
         .nav-link { color: rgba(255,255,255,0.7); font-size: 0.85rem; letter-spacing: 1px; padding: 15px 30px; }
         .nav-link:hover, .nav-link.active { color: var(--accent-gold); background: rgba(255,255,255,0.05); }
-        .brand-logo { font-family: 'Playfair Display'; padding: 0 30px 40px; color: var(--accent-gold); }
+        .brand-logo { font-family: 'Playfair Display'; padding: 0 30px 20px; color: var(--accent-gold); line-height: 1.2;}
 
         /* MOBILE OVERRIDES (Responsive Fix) */
-        @media (max-width: 992px) {
-            .sidebar {
-                left: -260px; /* Hide sidebar off-screen */
-            }
-            .sidebar.active {
-                left: 0; /* Slide in when active */
-            }
-            .main-content {
-                margin-left: 0; /* Use full width on mobile */
-                padding: 20px;
-                padding-top: 80px; /* Space for the mobile toggle */
-            }
-            .mobile-navbar {
-                display: flex !important;
-            }
-        }
+       @media (max-width: 992px) {
+    .sidebar {
+        left: -260px; /* Hide sidebar off-screen */
+        /* FIX: High z-index ensures it covers the blue mobile-navbar when open */
+        z-index: 2050 !important; 
+        /* FIX: Add padding so "Staff Portal" branding starts below the phone's notch */
+        padding-top: 80px; 
+        background: var(--primary-navy); /* Ensure background isn't transparent */
+        box-shadow: 10px 0 20px rgba(0,0,0,0.4); /* Adds depth when sliding out */
+    }
+
+    .sidebar.active {
+        left: 0; /* Slide in when active */
+    }
+
+    .main-content {
+        margin-left: 0; 
+        padding: 20px;
+        /* FIX: Increased padding so the page title doesn't hide behind the blue bar */
+        padding-top: 90px !important; 
+    }
+
+    .mobile-navbar {
+        display: flex !important;
+        /* Keep this just below the sidebar z-index */
+        z-index: 1001 !important; 
+    }
+}
 
         /* Mobile Header Toggle */
         .mobile-navbar {
