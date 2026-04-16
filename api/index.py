@@ -28,24 +28,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 1. This points to the /api folder where index.py lives
 api_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 2. Define the folders as children of /api
-template_dir = os.path.join(api_dir, 'templates')
 static_dir = os.path.join(api_dir, 'static')
 
+# 2. Point Flask to the folders now sitting inside 'api'
 app = Flask(__name__, 
-            template_folder=template_dir, 
-            static_folder=static_dir)
+            template_folder=os.path.join(api_dir, 'templates'), 
+            static_folder=os.path.join(api_dir, 'static'))
 
-# --- DEBUG CHECK ---
-# This will show 'YES' in your Vercel logs when fixed
-check_path = os.path.join(template_dir, 'public/index.html')
-print(f"VERCEL PATH SUCCESS: {os.path.exists(check_path)}")
+# --- FINAL DEBUG CHECK ---
+# This will show 'True' in your logs if the move worked
+target = os.path.join(api_dir, 'templates', 'public', 'index.html')
+print(f"VERCEL PATH SUCCESS: {os.path.exists(target)}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
-
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
