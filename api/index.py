@@ -156,7 +156,7 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 #app.config['MAIL_USERNAME'] = os.environ.get('thepetadoption@gmail.com')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 #app.config['MAIL_PASSWORD'] = os.environ.get('fyen afdm wiks gxwj')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'office@petadopt.ph')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'thepetadoption@gmail.com')
 
 mail = Mail(app)
 
