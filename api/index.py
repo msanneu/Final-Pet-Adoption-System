@@ -22,81 +22,40 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-import os
-from flask import Flask
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# This is the most reliable way to find the folder on a Vercel server
+# Find the absolute path to the 'api' folder on Vercel
 api_dir = os.path.dirname(os.path.realpath(__file__))
+static_dir = os.path.join(api_dir, 'static')
+template_dir = os.path.join(api_dir, 'templates')
 
-# Point to the actual folders inside /api
-# We define 'templates' as the root for Flask
+# ONLY INITIALIZE APP ONCE
 app = Flask(__name__, 
-template_folder=os.path.join(api_dir, 'templates'), 
-static_folder=os.path.join(api_dir, 'static'))
-static_dir = os.path.join(api_dir, 'static')    
+            template_folder=template_dir, 
+            static_folder=static_dir)
 
-# --- THE CRITICAL DEBUG CHECK ---
-# If this says 'True' in your logs, the site will work.
-check_path = os.path.join(api_dir, 'templates', 'public', 'index.html')
+# --- THE FINAL VERIFICATION ---
+check_path = os.path.join(template_dir, 'public', 'index.html')
 print(f"VERCEL PATH SUCCESS: {os.path.exists(check_path)}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
+# --- SUPABASE CONFIG ---
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase = None
-
 if supabase_url and supabase_key:
     supabase = create_client(supabase_url, supabase_key)
 
-
-def _valid_remote_db_url(url):
-    if not url:
-        return False
-    if '[YOUR-PASSWORD]' in url:
-        return False
-    try:
-        parsed = urlparse(url)
-    except ValueError:
-        return False
-    host = parsed.hostname
-    if not host:
-        return False
-    try:
-        socket.getaddrinfo(host, parsed.port or 5432)
-    except OSError:
-        return False
-
-    try:
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql://", 1)
-        engine = create_engine(url, connect_args={"connect_timeout": 5}, pool_pre_ping=True)
-        with engine.connect() as conn:
-            pass
-        engine.dispose()
-        return True
-    except Exception:
-        return False
-# --- CLOUD-SAFE DATABASE CONFIGURATION ---
+# --- DATABASE CONFIG ---
 database_url = os.environ.get("DATABASE_URL")
-
 if database_url:
-    # Fix for SQLAlchemy: convert 'postgres://' to 'postgresql://'
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     active_db = "SUPABASE (REMOTE)"
 else:
-    # Use local SQLite path
-    local_sqlite_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'pet_adoption.db')
-    
-    # CRITICAL: Only create the directory if we are NOT on Vercel
+    local_sqlite_path = os.path.join(api_dir, '..', 'instance', 'pet_adoption.db')
     if not os.environ.get('VERCEL'):
         os.makedirs(os.path.dirname(local_sqlite_path), exist_ok=True)
-    
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{local_sqlite_path}"
     active_db = "SQLITE (LOCAL)"
 
@@ -104,10 +63,11 @@ print(f"--- SYSTEM ACTIVE DB: {active_db} ---")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# 3. Now the functions can use the 'supabase' variable safely
-def save_upload(file):
-    if not supabase:
-        return None, "Supabase client not initialized."
+# --- UPLOAD CONFIG (Now uses static_dir safely) ---
+upload_dir = os.path.join(static_dir, 'uploads')
+if not os.environ.get('VERCEL'):
+    os.makedirs(upload_dir, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = upload_dir
 
 oauth = OAuth(app)
 google = oauth.register(
