@@ -44,6 +44,8 @@ app = Flask(
     static_folder=static_dir
 )
 
+app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
+
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase = None
@@ -103,10 +105,19 @@ print(f"--- SYSTEM ACTIVE DB: {active_db} ---")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# 3. Now the functions can use the 'supabase' variable safely
-def save_upload(file):  
-    if not supabase:
-        return None, "Supabase client not initialized."
+def save_upload(file):
+    if not file or file.filename == "": return None, "No file selected."
+    if not supabase: return None, "Cloud storage not initialized."
+    
+    filename = secure_filename(file.filename)
+    unique_name = f"{uuid4().hex}_{filename}"
+    file_content = file.read()
+    
+    try:
+        supabase.storage.from_('pet-assets').upload(unique_name, file_content)
+        return supabase.storage.from_('pet-assets').get_public_url(unique_name), None
+    except Exception as e:
+        return None, f"Upload failed: {str(e)}"
 
 oauth = OAuth(app)
 google = oauth.register(
@@ -239,17 +250,6 @@ def log_action(action_text):
         db.session.add(log)
         db.session.commit()
 
-def save_upload(file):
-    if not file or file.filename == "": return None, "No file selected."
-    filename = secure_filename(file.filename)
-    unique_name = f"{uuid4().hex}_{filename}"
-    
-    # Upload directly to Supabase Storage instead of local folder
-    file_content = file.read()
-    supabase.storage.from_('pet-assets').upload(unique_name, file_content)
-    
-    # Return the public URL instead of just the filename
-    return supabase.storage.from_('pet-assets').get_public_url(unique_name), None
 
 def is_authentic_email(email):
     return re.fullmatch(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email or "")
@@ -661,7 +661,7 @@ def admin_adopters():
         
     all_users = query.all()
     
-    return render_template('admin/admin_adopters.html', adopters=all_users)
+    return render_template('admin_adopters.html', adopters=all_users)
 
 @app.route('/admin/approve_application/<int:app_id>')
 def approve_application(app_id):
@@ -1016,7 +1016,7 @@ def manage_staff():
         return redirect(url_for('admin_login'))
     
     all_admins = AdminUser.query.all()
-    return render_template('admin/admin_list.html', all_admins=all_admins)
+    return render_template('admin_list.html', all_admins=all_admins)
 
 @app.route('/admin/add_admin', methods=['POST'])
 def add_admin():
@@ -1289,7 +1289,7 @@ def monthly_report():
 
     report_date_label = first_day.strftime('%B %Y')
 
-    return render_template('admin/admin_report.html', 
+    return render_template('admin_report.html', 
                            applications=finalized_apps, 
                            report_date=report_date_label,
                            selected_month=month,
