@@ -23,23 +23,26 @@ from supabase import create_client
 load_dotenv() 
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-# This finds the absolute path to the 'api' folder on Vercel
-api_dir = os.path.dirname(os.path.realpath(__file__))
-static_dir = os.path.join(api_dir, 'static')
+CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, '..'))
 
-# Point Flask to the folders INSIDE 'api'
-# We use os.path.join to ensure the slashes work on Vercel's Linux servers
-app = Flask(__name__, 
-            template_folder=os.path.join(api_dir, 'templates'), 
-            static_folder=os.path.join(api_dir, 'static'))
+template_dirs = [
+    os.path.join(CURRENT_DIR, 'templates'),
+    os.path.join(ROOT_DIR, 'templates'),
+]
+static_dirs = [
+    os.path.join(CURRENT_DIR, 'static'),
+    os.path.join(ROOT_DIR, 'static'),
+]
 
-# --- THE FINAL VERIFICATION ---
-# If this says 'True', your site is 100% working.
-check_path = os.path.join(api_dir, 'templates', 'index.html')
-print(f"VERCEL PATH SUCCESS: {os.path.exists(check_path)}")
-print(f"DEBUG - Full Absolute Path: {check_path}")
+template_dir = next((d for d in template_dirs if os.path.isdir(d)), template_dirs[0])
+static_dir = next((d for d in static_dirs if os.path.isdir(d)), static_dirs[0])
 
-app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
+app = Flask(
+    __name__,
+    template_folder=template_dir,
+    static_folder=static_dir
+)
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
