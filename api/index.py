@@ -22,7 +22,8 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv 
 from supabase import create_client
 load_dotenv() 
-os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
+if not os.environ.get('VERCEL'):
+    os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, '..'))
@@ -151,8 +152,8 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USERNAME'] = os.environ.get('thepetadoption@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('fyen afdm wiks gxwj')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'office@petadopt.ph')
 
 mail = Mail(app)
