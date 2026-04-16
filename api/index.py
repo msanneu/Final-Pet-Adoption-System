@@ -35,7 +35,7 @@ app = Flask(__name__,
 
 # --- THE FINAL VERIFICATION ---
 # If this says 'True', your site is 100% working.
-check_path = os.path.join(api_dir, 'templates', 'public', 'index.html')
+check_path = os.path.join(api_dir, 'templates', 'index.html')
 print(f"VERCEL PATH SUCCESS: {os.path.exists(check_path)}")
 print(f"DEBUG - Full Absolute Path: {check_path}")
 
@@ -289,7 +289,7 @@ def _ensure_sqlite_schema():
 
 @app.route('/')
 def index():
-    return render_template('public/index.html', pets=Pet.query.filter_by(status="Available").all())
+    return render_template('index.html', pets=Pet.query.filter_by(status="Available").all())
 
 @app.route('/adopt/<int:pet_id>', methods=['GET', 'POST'])
 def adopt(pet_id):
@@ -374,7 +374,7 @@ def adopt(pet_id):
         flash(f"Application for {pet.name} submitted!", "success")
         return redirect(url_for('adopter_dashboard'))
 
-    return render_template('public/adopt.html', pet=pet)
+    return render_template('adopt.html', pet=pet)
 
 @app.route('/dashboard')
 def adopter_dashboard():
@@ -387,7 +387,7 @@ def adopter_dashboard():
     # Just fetch the applications and send them to the template
     reqs = AdoptionApplication.query.filter_by(user_id=uid).all()
     
-    return render_template('adopter/adopter_dashboard.html', user=user, requests=reqs)
+    return render_template('adopter_dashboard.html', user=user, requests=reqs)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -399,7 +399,7 @@ def admin_login():
             return redirect(url_for('admin_dashboard'))
         flash("Invalid username or password.", "danger")
         return redirect(request.url) 
-    return render_template('admin/admin.html', login_mode=True)
+    return render_template('admin.html', login_mode=True)
     
 
 @app.route('/admin/dashboard')
@@ -446,7 +446,7 @@ def admin_dashboard():
         AdoptionApplication.status.in_(["Returned", "Claimed", "Declined"])
     ).order_by(AdoptionApplication.application_date.desc()).all()
     total_finalized_adoptions = AdoptionApplication.query.filter_by(status="Claimed").count()
-    return render_template('admin/admin_dashboard.html', 
+    return render_template('admin_dashboard.html', 
                        pets=Pet.query.all(), 
                        pending_applications=pending, 
                        scheduled_apps=active_tasks,     
@@ -596,7 +596,7 @@ def admin_inventory():
     
     pets = query.all()
     
-    return render_template('admin/admin_inventory.html', pets=pets)
+    return render_template('admin_inventory.html', pets=pets)
 
 @app.route('/admin/schedule')
 def admin_schedule():
@@ -610,13 +610,13 @@ def admin_schedule():
         AdoptionApplication.status.notin_(["Claimed", "Declined"])
     )).all()
     
-    return render_template('admin/admin_schedule.html', pending_applications=pending, scheduled_apps=tasks)
+    return render_template('admin_schedule.html', pending_applications=pending, scheduled_apps=tasks)
 
 @app.route('/admin/archive')
 def admin_archive():
     if not get_current_admin(): return redirect(url_for('admin_login'))
     history = AdoptionApplication.query.filter(AdoptionApplication.status.in_(["Returned", "Claimed"])).all()
-    return render_template('admin/admin_archive.html', history_apps=history, logs=AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(50).all())
+    return render_template('admin_archive.html', history_apps=history, logs=AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(50).all())
 
 @app.route('/admin/adopter/<int:user_id>')
 def admin_view_adopter(user_id):
@@ -629,7 +629,7 @@ def admin_view_adopter(user_id):
     
     user_apps = AdoptionApplication.query.filter_by(user_id=user_id).order_by(AdoptionApplication.application_date.desc()).all()
     
-    return render_template('admin/admin_adopter_profile.html', adopter=target_user, applications=user_apps)
+    return render_template('admin_adopter_profile.html', adopter=target_user, applications=user_apps)
 
 @app.route('/admin/pet_profile/<int:pet_id>')
 def admin_view_pet(pet_id):
@@ -640,7 +640,7 @@ def admin_view_pet(pet_id):
         flash("Pet profile not found.", "danger")
         return redirect(request.referrer or url_for('admin_dashboard'))
         
-    return render_template('admin/admin_pet_profile.html', pet=pet)
+    return render_template('admin_pet_profile.html', pet=pet)
 
 @app.route('/admin/adopters')
 def admin_adopters():
@@ -765,7 +765,7 @@ def adopter_register():
                 
             return redirect(url_for('adopter_login'))
             
-    return render_template('adopter/adopter_auth.html', mode='register')
+    return render_template('adopter_auth.html', mode='register')
 
 @app.route('/login', methods=['GET', 'POST'])
 def adopter_login():
@@ -789,7 +789,7 @@ def adopter_login():
         flash("Invalid credentials.", "danger")
         return redirect(request.url)
 
-    return render_template('adopter/adopter_auth.html', mode='login')
+    return render_template('adopter_auth.html', mode='login')
 
 @app.route('/login/google')
 def google_login():
@@ -857,7 +857,7 @@ def view_cart():
         return redirect(url_for('index'))
     
     selected_pets = Pet.query.filter(Pet.id.in_(session['cart'])).all()
-    return render_template('public/cart.html', pets=selected_pets)
+    return render_template('cart.html', pets=selected_pets)
 
 @app.route('/profile', methods=['GET', 'POST'])
 def adopter_profile():
@@ -923,7 +923,7 @@ def adopter_profile():
         flash("Profile updated successfully.", "success")
         return redirect(url_for('adopter_profile'))
         
-    return render_template('adopter/adopter_profile.html', user=user)
+    return render_template('adopter_profile.html', user=user)
 
 @app.route('/profile/password', methods=['POST'])
 def adopter_password():
@@ -1320,7 +1320,7 @@ def forgot_password():
         flash("If registered, a reset link has been sent via Gmail.", "info")
         return redirect(url_for('adopter_login'))
     # This explicitly tells the template to show the 'forgot' recovery UI
-    return render_template('adopter/adopter_auth.html', mode='forgot')
+    return render_template('adopter_auth.html', mode='forgot')
 
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -1337,7 +1337,7 @@ def reset_password(token):
         flash("Password reset successful! You can now log in.", "success")
         return redirect(url_for('adopter_login'))
         
-    return render_template('adopter/adopter_auth.html', mode='reset', token=token)
+    return render_template('adopter_auth.html', mode='reset', token=token)
 
     # --- CLEAN & FIXED SETUP ROUTE ---
 @app.route('/setup-admin-9911')
