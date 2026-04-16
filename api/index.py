@@ -127,8 +127,8 @@ def save_upload(file):
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id=os.environ.get('GOOGLE_CLIENT_ID'),
-    client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
+    client_id=os.environ.get('706138340659-ibdio7l3j0bt1il31ckontscclcd3sic.apps.googleusercontent.com'),
+    client_secret=os.environ.get('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'),
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     access_token_url='https://oauth2.googleapis.com/token',
     access_token_params=None,
