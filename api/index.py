@@ -127,8 +127,8 @@ def save_upload(file):
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id=os.environ.get('GOOGLE_CLIENT_ID'),
-    client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
+    client_id=os.environ.get('706138340659-ibdio7l3j0bt1il31ckontscclcd3sic.apps.googleusercontent.com'),
+    client_secret=os.environ.get('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'),
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     access_token_url='https://oauth2.googleapis.com/token',
     access_token_params=None,
@@ -152,8 +152,8 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USERNAME'] = os.environ.get('thepetadoption@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('fyen afdm wiks gxwj')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'office@petadopt.ph')
 
 mail = Mail(app)
