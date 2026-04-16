@@ -4,6 +4,7 @@ import os
 import re
 import csv
 import socket
+from datetime import datetime
 from io import StringIO
 from urllib.parse import urlparse
 from flask import Response
@@ -100,7 +101,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # 3. Now the functions can use the 'supabase' variable safely
-def save_upload(file):
+def save_upload(file):  
     if not supabase:
         return None, "Supabase client not initialized."
 
@@ -138,9 +139,6 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'offic
 
 mail = Mail(app)
 
-
-from datetime import datetime
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=False)
@@ -174,8 +172,6 @@ class Pet(db.Model):
     applications = db.relationship('ApplicationItem', backref='pet_record', cascade="all, delete", lazy=True)
     adoption_date = db.Column(db.DateTime, nullable=True)
     current_adopter = db.relationship('User', backref='adopted_pets')
-
-
 
 
 class AdoptionApplication(db.Model):

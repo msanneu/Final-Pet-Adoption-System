@@ -25,3 +25,5 @@ Thumbs.db
 # --- DATABASE / LOCAL STORAGE ---
 *.db
 *.sqlite3
+# Local Netlify folder
+.netlify
