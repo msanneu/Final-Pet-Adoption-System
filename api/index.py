@@ -18,6 +18,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import select, create_engine, inspect, text
 from sqlalchemy.exc import OperationalError
 from authlib.integrations.flask_client import OAuth
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv 
 from supabase import create_client
 load_dotenv() 
@@ -43,6 +44,9 @@ app = Flask(
     template_folder=template_dir,
     static_folder=static_dir
 )
+
+# Add this to handle Vercel's proxy and force HTTPS for OAuth
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
