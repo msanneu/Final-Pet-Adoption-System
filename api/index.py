@@ -28,20 +28,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-api_dir = os.path.dirname(os.path.abspath(__file__))
+# This is the most reliable way to find the folder on a Vercel server
+api_dir = os.path.dirname(os.path.realpath(__file__))
 
-static_dir = os.path.join(api_dir, 'static')
-template_dir = os.path.join(api_dir, 'templates')
-
-# 2. Point Flask to the folders now sitting inside 'api'
+# Point to the actual folders inside /api
+# We define 'templates' as the root for Flask
 app = Flask(__name__, 
-            template_folder=os.path.join(api_dir, 'templates'), 
-            static_folder=os.path.join(api_dir, 'static'))
+template_folder=os.path.join(api_dir, 'templates'), 
+static_folder=os.path.join(api_dir, 'static'))
+static_dir = os.path.join(api_dir, 'static')    
 
-# --- FINAL DEBUG CHECK ---
-# This will show 'True' in your logs if the move worked
-target = os.path.join(api_dir, 'templates', 'public', 'index.html')
-print(f"VERCEL PATH SUCCESS: {os.path.exists(target)}")
+# --- THE CRITICAL DEBUG CHECK ---
+# If this says 'True' in your logs, the site will work.
+check_path = os.path.join(api_dir, 'templates', 'public', 'index.html')
+print(f"VERCEL PATH SUCCESS: {os.path.exists(check_path)}")
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
