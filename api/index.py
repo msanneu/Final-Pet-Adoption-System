@@ -31,6 +31,7 @@ load_dotenv()
 api_dir = os.path.dirname(os.path.abspath(__file__))
 
 static_dir = os.path.join(api_dir, 'static')
+template_dir = os.path.join(api_dir, 'templates')
 
 # 2. Point Flask to the folders now sitting inside 'api'
 app = Flask(__name__, 
