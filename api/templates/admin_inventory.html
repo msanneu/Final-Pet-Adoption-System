@@ -446,35 +446,40 @@
 
 
     /* Modal Height and Fullscreen on Mobile */
-    @media (max-width: 576px) {
-        .modal-fullscreen-sm-down { margin: 0; max-width: 100%; height: 100%; }
-        .modal-fullscreen-sm-down .modal-content { height: 100%; border-radius: 0; }
-        .modal-body { overflow-y: auto; }
-    }
+   @media (max-width: 991.98px) {
+        /* Sidebar and Layout Fixes */
+        .main-content, #content { margin-left: 0 !important; width: 100% !important; padding: 15px !important; padding-top: 50px !important; }
+        .sidebar.active, #sidebar.active { display: block !important; }
+        .d-flex.justify-content-between.align-items-md-center { flex-direction: column !important; align-items: flex-start !important; }
 
-    @media (max-width: 991.98px) {
-        .main-content {
-            position: relative;
-            z-index: 1; /* Keeps content clickable */
+        /* Fullscreen Modal Logic */
+        .modal-fullscreen-sm-down { margin: 0 !important; max-width: 100% !important; height: 100vh !important; }
+        .modal-fullscreen-sm-down .modal-content { 
+            height: 100vh !important; 
+            border-radius: 0; 
+            display: flex !important; 
+            flex-direction: column !important; 
+        }
+        
+        /* Forces the body to scroll and prevents fields from overlapping */
+        .modal-body { 
+            flex: 1 1 auto !important; 
+            overflow-y: auto !important; 
+            padding: 20px !important; 
+        }
+        
+        /* Keeps buttons accessible at the bottom */
+        .modal-footer { 
+            flex-shrink: 0 !important; 
+            background: #fff; 
+            border-top: 1px solid #eee; 
         }
 
-        /* 3. SHOW sidebar when 'active' class is present */
-        .sidebar.active, #sidebar.active {
-            display: block !important;
-        }
-
-        /* 4. Content width adjustment */
-        .main-content, #content {
-            margin-left: 0 !important;
+        /* Un-stuff the grid: Force inputs to stack so they aren't cramped */
+        .col-4, .col-6, .col-md-6, .col-md-4 {
             width: 100% !important;
-            padding: 15px !important;
-            padding-top: 50px !important;
-        }
-
-        /* 5. Header Stack Fix */
-        .d-flex.justify-content-between.align-items-md-center {
-            flex-direction: column !important;
-            align-items: flex-start !important;
+            flex: 0 0 100% !important;
+            margin-bottom: 10px;
         }
     }
 </style>
