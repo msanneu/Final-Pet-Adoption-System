@@ -51,13 +51,16 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 app.secret_key = os.environ.get("SECRET_KEY", "petadopt_secret_2026_key")
 
+# --- SUPABASE CLOUD STORAGE CONFIG ---
 supabase_url = os.environ.get("SUPABASE_URL")
-supabase_key = os.environ.get("SUPABASE_KEY")
-supabase = None
+supabase_key = os.environ.get("SUPABASE_KEY") # Ensure this is your SERVICE_ROLE key
 
-if supabase_url and supabase_key:
+if not supabase_url or not supabase_key:
+    print("CRITICAL: Supabase credentials missing from .env!")
+    supabase = None
+else:
+    from supabase import create_client
     supabase = create_client(supabase_url, supabase_key)
-
 
 def _valid_remote_db_url(url):
     if not url:
@@ -473,7 +476,7 @@ def admin_dashboard():
 def add_pet():
     if not get_current_admin(): return redirect(url_for('admin_login'))
     file = request.files.get('photo')
-    filename, error = save_upload(file)
+    filename, error = save_upload(file, 'pet-assets')
     if error:
         flash(error, "danger")
         return redirect(url_for('admin_dashboard'))
@@ -511,7 +514,7 @@ def edit_pet(pet_id):
         pet.other_description = request.form.get('other_description')
         file = request.files.get('photo')
         if file and file.filename != '':
-            new_img, err = save_upload(file)
+            new_img, err = save_upload(file, 'pet-assets') # Added 'pet-assets'
             if not err:
                 if pet.photo: 
                     try: os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pet.photo))
@@ -526,17 +529,36 @@ def edit_pet(pet_id):
 
 @app.route('/admin/delete_pet/<int:pet_id>')
 def delete_pet(pet_id):
-    if not get_current_admin(): return redirect(url_for('admin_login'))
+    if not get_current_admin(): 
+        return redirect(url_for('admin_login'))
+        
     pet = Pet.query.get_or_404(pet_id)
     pet_name = pet.name
+    
+    # NEW FIX: Use Supabase helper instead of local os.remove
     if pet.photo:
-        try: os.remove(os.path.join(app.config['UPLOAD_FOLDER'], pet.photo))
-        except: pass
+        # We assume pet.photo stores the filename or the full public URL
+        # If it's a full URL, we extract the filename for the bucket removal
+        filename_to_delete = pet.photo.split('/')[-1] if '/' in pet.photo else pet.photo
+        success, error = delete_upload(filename_to_delete, 'pet-assets')
+        
+        if not success:
+            print(f"Cloud storage cleanup failed for {pet_name}: {error}")
+
     db.session.delete(pet)
     db.session.commit()
+    
     log_action(f"Permanently removed pet: {pet_name}")
-    flash("Pet removed.", "info")
-    return redirect(request.referrer or url_for('admin_dashboard')) 
+    flash(f"Pet '{pet_name}' has been removed from the registry.", "info")
+    return redirect(request.referrer or url_for('admin_dashboard'))
+
+def delete_upload(filename, bucket_name='pet-assets'):
+    try:
+        # The filename should be the same one saved in your database
+        res = supabase.storage.from_(bucket_name).remove([filename])
+        return True, None
+    except Exception as e:
+        return False, str(e)
 
 @app.route('/schedule_pickup/<int:app_id>', methods=['POST'])
 def schedule_pickup(app_id):

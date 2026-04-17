@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#1a2a3a">
     <style>
         :root { --primary-navy: #1a2a3a; --accent-gold: #c5a059; --bg-dashboard: #fdfdfb; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dashboard); overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dashboard); overflow-x: hidden; overflow-y: auto !important; }
 
         /* SIDEBAR LOGIC */
         .sidebar { 
@@ -91,6 +91,18 @@
             padding: 5px 10px;
             border-radius: 5px;
         }
+
+
+        /* DESKTOP FIX: Bring the sidebar back on large screens */
+@media (min-width: 993px) {
+    .sidebar {
+        left: 0 !important; /* Force it to stay visible on desktop */
+    }
+    
+    .main-content {
+        margin-left: 260px; /* Keep the space for the sidebar */
+    }
+}
     </style>
 </head>
 <body>

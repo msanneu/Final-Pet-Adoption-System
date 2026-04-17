@@ -351,7 +351,7 @@
     <div class="col-md-6 col-lg-4">
         <div class="card pet-card h-100 border-0 shadow-sm overflow-hidden" style="border-radius: 20px; transition: transform 0.3s ease;">
             <div class="position-relative overflow-hidden">
-                <img src="{{ pet.photo if pet.photo and pet.photo.startswith('http') else url_for('static', filename='uploads/' + (pet.photo if pet.photo else '')) }}" 
+                <img src="{{ pet.photo }}" 
                      class="card-img-top" style="height: 350px; object-fit: cover; transition: transform 0.5s ease;"
                      onerror="this.src='https://via.placeholder.com/400x500';">
                 
@@ -558,7 +558,7 @@
     <div class="row g-0">
         <div class="col-md-5 bg-light d-flex align-items-stretch">
             <div class="w-100 position-relative">
-                <img src="{{ pet.photo if pet.photo and pet.photo.startswith('http') else url_for('static', filename='uploads/' + (pet.photo if pet.photo else '')) }}" 
+                <img src="{{ pet.photo }}" 
                      class="img-fluid h-100 w-100" style="object-fit: cover; min-height: 500px;"
                      onerror="this.src='https://via.placeholder.com/400x500';">
                 
