@@ -151,7 +151,7 @@ if not os.environ.get('VERCEL'):
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = upload_dir
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
