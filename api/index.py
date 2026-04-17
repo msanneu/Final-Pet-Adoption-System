@@ -110,7 +110,7 @@ print(f"--- SYSTEM ACTIVE DB: {active_db} ---")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-def save_upload(file):
+def save_upload(file, bucket_name): # Added bucket_name parameter
     if not file or file.filename == "": return None, "No file selected."
     if not supabase: return None, "Cloud storage not initialized."
     
@@ -119,8 +119,10 @@ def save_upload(file):
     file_content = file.read()
     
     try:
-        supabase.storage.from_('pet-assets').upload(unique_name, file_content)
-        return supabase.storage.from_('pet-assets').get_public_url(unique_name), None
+        # Uses the bucket_name passed from the route
+        supabase.storage.from_(bucket_name).upload(unique_name, file_content)
+        # Returns the full public URL for database storage
+        return supabase.storage.from_(bucket_name).get_public_url(unique_name), None
     except Exception as e:
         return None, f"Upload failed: {str(e)}"
 
@@ -1105,14 +1107,16 @@ def submit_application():
         flash("No pets selected for adoption.", "warning")
         return redirect(url_for('index'))
 
+    # Upload ID to 'adopter-ids' bucket
     file_id = request.files.get('id_proof')
-    filename_id, err_id = save_upload(file_id)
+    filename_id, err_id = save_upload(file_id, bucket_name="adopter-ids")
     if err_id:
         flash(f"ID Upload Error: {err_id}", "danger")
         return redirect(url_for('view_cart'))
 
+    # Upload Home Photo to 'adopter-homes' bucket
     file_home = request.files.get('home_picture')
-    filename_home, err_home = save_upload(file_home)
+    filename_home, err_home = save_upload(file_home, bucket_name="adopter-homes")
     if err_home:
         flash(f"Home Picture Error: {err_home}", "danger")
         return redirect(url_for('view_cart'))

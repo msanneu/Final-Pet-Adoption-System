@@ -146,17 +146,19 @@
                 {% endwith %}
 
                 <div class="pet-preview-sm">
-                    {% if pet.photo %}
-                    <img src="{{ url_for('static', filename='uploads/' + pet.photo) }}" alt="{{ pet.name }}">
-                    {% else %}
-                    <img src="https://via.placeholder.com/300" alt="{{ pet.name }}">
-                    {% endif %}
-                    <div>
-                        <small class="text-uppercase fw-bold text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">Initiating Dossier for:</small>
-                        <h4 class="fw-bold mb-0" style="color: var(--primary-navy);">{{ pet.name }}</h4>
-                        <span class="badge bg-navy text-white mt-2 px-2 py-1" style="font-size: 0.55rem; background: var(--primary-navy);">{{ pet.breed|upper }}</span>
-                    </div>
-                </div>
+    {% if pet.photo %}
+        <img src="{{ pet.photo if pet.photo.startswith('http') else url_for('static', filename='uploads/' + pet.photo) }}" 
+             alt="{{ pet.name }}" 
+             onerror="this.src='https://via.placeholder.com/300';">
+    {% else %}
+        <img src="https://via.placeholder.com/300" alt="{{ pet.name }}">
+    {% endif %}
+    <div>
+        <small class="text-uppercase fw-bold text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">Initiating Dossier for:</small>
+        <h4 class="fw-bold mb-0" style="color: var(--primary-navy);">{{ pet.name }}</h4>
+        <span class="badge bg-navy text-white mt-2 px-2 py-1" style="font-size: 0.55rem; background: var(--primary-navy);">{{ pet.breed|upper }}</span>
+    </div>
+</div>
 
                 <form method="POST" enctype="multipart/form-data">
                     

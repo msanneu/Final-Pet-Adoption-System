@@ -15,12 +15,14 @@
         <div class="row g-4">
             
             <div class="col-12 col-md-4 text-center border-md-end">
-                <label class="form-label small fw-bold text-muted text-uppercase mb-3 d-block">Current Photo</label>
-                <div class="position-relative d-inline-block w-100 mb-3" style="max-width: 300px;">
-                    <img src="{{ url_for('static', filename='uploads/' + pet.photo) if pet.photo else 'https://via.placeholder.com/300' }}" 
-                         class="img-fluid rounded border shadow-sm" 
-                         style="aspect-ratio: 1/1; object-fit: cover; width: 100%;">
-                </div>
+    <label class="form-label small fw-bold text-muted text-uppercase mb-3 d-block">Current Photo</label>
+    <div class="position-relative d-inline-block w-100 mb-3" style="max-width: 300px;">
+        <img src="{{ pet.photo if pet.photo and pet.photo.startswith('http') else url_for('static', filename='uploads/' + (pet.photo if pet.photo else '')) }}" 
+             class="img-fluid rounded border shadow-sm" 
+             style="aspect-ratio: 1/1; object-fit: cover; width: 100%;"
+             onerror="this.src='https://via.placeholder.com/300';">
+    </div>
+</div>
                 
                 <div class="px-2">
                     <input type="file" name="photo" class="form-control form-control-sm rounded-0 shadow-sm" accept=".jpg,.jpeg,.png,.webp">

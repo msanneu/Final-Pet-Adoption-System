@@ -240,21 +240,24 @@
                     <p class="text-muted mb-4" style="font-size: 0.75rem;">Submitted on {{ app.application_date.strftime('%B %d, %Y') }}</p>
                     
                     <div class="d-flex flex-column gap-2 mb-4">
-                        {% for item in app.items %}
-                        <div class="d-flex align-items-center p-2 rounded" 
-                             style="background-color: #f8f9fa; cursor: pointer; transition: all 0.2s ease;" 
-                             onmouseover="this.style.backgroundColor='#ffffff'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.05)'" 
-                             onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.boxShadow='none'"
-                             data-bs-toggle="modal" data-bs-target="#petDetailModal{{ item.pet.id }}">
-                            <img src="{{ url_for('static', filename='uploads/' + item.pet.photo) }}" 
-                                 class="rounded-1 me-3" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid #e0e0e0;">
-                            <div class="flex-grow-1">
-                                <span class="fw-bold text-navy d-block" style="font-size: 0.85rem; line-height: 1.2;">{{ item.pet.name }}</span>
-                                <span class="text-muted" style="font-size: 0.7rem;">View Record &rarr;</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
+    {% for item in app.items %}
+    <div class="d-flex align-items-center p-2 rounded" 
+         style="background-color: #f8f9fa; cursor: pointer; transition: all 0.2s ease;" 
+         onmouseover="this.style.backgroundColor='#ffffff'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.05)'" 
+         onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.boxShadow='none'"
+         data-bs-toggle="modal" data-bs-target="#petDetailModal{{ item.pet.id }}">
+        
+        <img src="{{ item.pet.photo if item.pet.photo and item.pet.photo.startswith('http') else url_for('static', filename='uploads/' + (item.pet.photo if item.pet.photo else '')) }}" 
+             class="rounded-1 me-3" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid #e0e0e0;"
+             onerror="this.src='https://via.placeholder.com/40';">
+             
+        <div class="flex-grow-1">
+            <span class="fw-bold text-navy d-block" style="font-size: 0.85rem; line-height: 1.2;">{{ item.pet.name }}</span>
+            <span class="text-muted" style="font-size: 0.7rem;">View Record &rarr;</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
                     <button type="button" class="btn btn-sm btn-outline-dark rounded-1 fw-bold w-100" style="font-size: 0.7rem; letter-spacing: 1px;" data-bs-toggle="modal" data-bs-target="#viewResponseModal{{ app.id }}">
                         VIEW SUBMITTED FILE
@@ -554,15 +557,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="row g-0">
                     
                     <div class="col-md-5 border-end border-light-subtle bg-light">
-                        <div class="p-4 d-flex flex-column align-items-center justify-content-center h-100">
-                            <div class="border shadow-sm p-2 bg-white mb-3" style="width: 100%; border-color: #dcdcdc !important;">
-                                <img src="{{ url_for('static', filename='uploads/' + item.pet.photo) }}" 
-                                     class="img-fluid rounded-0 w-100" 
-                                     style="max-height: 280px; object-fit: cover;">
-                            </div>
-                            <p class="x-small text-muted mb-0 text-uppercase fw-bold" style="letter-spacing: 1.5px;">Registry ID: #PET-{{ item.pet.id }}</p>
-                        </div>
-                    </div>
+    <div class="p-4 d-flex flex-column align-items-center justify-content-center h-100">
+        <div class="border shadow-sm p-2 bg-white mb-3" style="width: 100%; border-color: #dcdcdc !important;">
+            <img src="{{ item.pet.photo if item.pet.photo and item.pet.photo.startswith('http') else url_for('static', filename='uploads/' + (item.pet.photo if item.pet.photo else '')) }}" 
+                 class="img-fluid rounded-0 w-100" 
+                 style="max-height: 280px; object-fit: cover;"
+                 onerror="this.src='https://via.placeholder.com/300';">
+        </div>
+        <p class="x-small text-muted mb-0 text-uppercase fw-bold" style="letter-spacing: 1.5px;">Registry ID: #PET-{{ item.pet.id }}</p>
+    </div>
+</div>
 
                     <div class="col-md-7">
                         <div class="p-4 h-100">
