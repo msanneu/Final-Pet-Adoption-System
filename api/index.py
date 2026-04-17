@@ -313,13 +313,13 @@ def adopt(pet_id):
     
     if request.method == 'POST':
         file_id = request.files.get('id_proof')
-        filename_id, err_id = save_upload(file_id)
+        filename_id, err_id = save_upload(file_id, bucket_name="adopter-ids")
         if err_id: 
             flash(err_id, "danger")
             return redirect(request.url)
 
         file_home = request.files.get('home_picture')
-        filename_home, err_home = save_upload(file_home)
+        filename_home, err_home = save_upload(file_home, bucket_name="adopter-homes")
         if err_home:
             flash(err_home, "danger")
             return redirect(request.url)
