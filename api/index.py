@@ -193,7 +193,7 @@ class Pet(db.Model):
     vac_date = db.Column(db.String(20), nullable=False)        
     special_needs = db.Column(db.Text, default="N/A")
     other_description = db.Column(db.Text)
-    status = db.Column(db.String(20), default="N/A")
+    status = db.Column(db.String(20), default="Available")
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     applications = db.relationship('ApplicationItem', backref='pet_record', cascade="all, delete", lazy=True)
     adoption_date = db.Column(db.DateTime, nullable=True)
@@ -494,12 +494,19 @@ def add_pet():
         return redirect(url_for('admin_dashboard'))
     
     new_pet = Pet(
-        name=request.form.get('name'), breed=request.form.get('breed'),
-        age_category=request.form.get('age_category'), gender=request.form.get('gender'),
-        size=request.form.get('size'), energy_level=request.form.get('energy_level'),
-        spayed_neutered=request.form.get('spayed_neutered'), vac_status=request.form.get('vac_status'),
-        vac_date=request.form.get('vac_date'), special_needs=request.form.get('special_needs') or "N/A",
-        other_description=request.form.get('other_description'), photo=filename
+        name=request.form.get('name'),
+        breed=request.form.get('breed'),
+        age_category=request.form.get('age_category'),
+        gender=request.form.get('gender'),
+        size=request.form.get('size'),
+        energy_level=request.form.get('energy_level'),
+        spayed_neutered=request.form.get('spayed_neutered'),
+        vac_status=request.form.get('vac_status'),
+        vac_date=request.form.get('vac_date'),
+        special_needs=request.form.get('special_needs') or "N/A",
+        other_description=request.form.get('other_description'),
+        status="Available", 
+        photo=filename
     )
     db.session.add(new_pet)
     db.session.commit()
