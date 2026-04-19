@@ -155,8 +155,9 @@
                         <div class="d-flex flex-column gap-2 small">
                             <p class="mb-0 text-break"><strong>Full Name:</strong> {{ app.adopter_name }}</p>
                             <p class="mb-0 text-break"><strong>Email:</strong> {{ app.email }}</p>
-                            <p class="mb-0"><strong>Contact:</strong> {{ app.phone }}</p>
+                            <p class="mb-0"><strong>Contact:</strong> {{ app.phone_number }}</p>
                             <p class="mb-0"><strong>Occupation:</strong> {{ app.occupation }}</p>
+                            <p class="mb-0"><strong>Home Address:</strong> {{ app.home_address}}</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
@@ -186,16 +187,16 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <h6 class="fw-bold text-uppercase x-small ls-2 text-muted mb-3 border-bottom pb-2">IV. Documents</h6>
-                        <div class="d-grid d-sm-flex gap-2">
-                            {% if app.id_proof %}
-                                <button type="button" data-img-src="{{ url_for('static', filename='uploads/' + app.id_proof) }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-view-file py-3 w-100">VIEW GOV ID</button>
-                            {% endif %}
-                            {% if app.home_picture %}
-                                <button type="button" data-img-src="{{ url_for('static', filename='uploads/' + app.home_picture) }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-view-file py-3 w-100">VIEW HOME PHOTOS</button>
-                            {% endif %}
-                        </div>
+                    <h6 class="fw-bold text-uppercase x-small ls-2 text-muted mb-3 border-bottom pb-2">IV. Documents</h6>
+                    <div class="d-grid d-sm-flex gap-2">
+                        {% if app.id_proof %}
+                            <button type="button" data-img-src="{{ app.id_proof }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-view-file py-3 w-100">VIEW GOV ID</button>
+                        {% endif %}
+                        {% if app.home_picture %}
+                            <button type="button" data-img-src="{{ app.home_picture }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-view-file py-3 w-100">VIEW HOME PHOTOS</button>
+                        {% endif %}
                     </div>
+                </div>
                 </div>
             </div>
             <div class="modal-footer border-0 bg-light p-3 p-md-4 d-flex flex-column flex-sm-row justify-content-sm-between gap-3">

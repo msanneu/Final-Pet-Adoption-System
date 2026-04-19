@@ -151,7 +151,7 @@ if not os.environ.get('VERCEL'):
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = upload_dir
-app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -182,19 +182,19 @@ class User(db.Model):
 class Pet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    breed = db.Column(db.String(50))
-    photo = db.Column(db.String(200))
-    age_category = db.Column(db.String(20))    
-    gender = db.Column(db.String(10))          
-    size = db.Column(db.String(10))            
-    energy_level = db.Column(db.String(20))    
-    spayed_neutered = db.Column(db.String(5))  
-    vac_status = db.Column(db.String(30))      
-    vac_date = db.Column(db.String(20))        
+    breed = db.Column(db.String(50), nullable=False)
+    photo = db.Column(db.String(200), nullable=False)
+    age_category = db.Column(db.String(20), nullable=False)    
+    gender = db.Column(db.String(10), nullable=False)          
+    size = db.Column(db.String(10), nullable=False)            
+    energy_level = db.Column(db.String(20), nullable=False)    
+    spayed_neutered = db.Column(db.String(5), nullable=False)  
+    vac_status = db.Column(db.String(30), nullable=False)      
+    vac_date = db.Column(db.String(20), nullable=False)        
     special_needs = db.Column(db.Text, default="N/A")
     other_description = db.Column(db.Text)
-    status = db.Column(db.String(20), default="Available")
-    adopter_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    status = db.Column(db.String(20), default="N/A")
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     applications = db.relationship('ApplicationItem', backref='pet_record', cascade="all, delete", lazy=True)
     adoption_date = db.Column(db.DateTime, nullable=True)
     current_adopter = db.relationship('User', backref='adopted_pets')
@@ -205,22 +205,23 @@ class AdoptionApplication(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) 
     adopter_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
+    phone_number = db.Column(db.String(20), nullable=False)
+    home_address = db.Column(db.String(200), nullable=False) # Ensure this column exists here too
     id_proof = db.Column(db.String(200), nullable=False)
     status = db.Column(db.String(20), default="Pending") 
 
-    phone = db.Column(db.String(20), nullable=True)
-    occupation = db.Column(db.String(100), nullable=True)
+    occupation = db.Column(db.String(100), nullable=False)
 
-    q_home_type = db.Column(db.String(255), nullable=True)
-    q_yard_access = db.Column(db.String(255), nullable=True)
-    household_size = db.Column(db.String(100), nullable=True)
+    q_home_type = db.Column(db.String(255), nullable=False)
+    q_yard_access = db.Column(db.String(255), nullable=False)
+    household_size = db.Column(db.String(100), nullable=False)
     
-    q_hours_alone = db.Column(db.String(100), nullable=True)
-    other_pets = db.Column(db.String(255), nullable=True)
-    q_pet_experience = db.Column(db.Text, nullable=True)
-    financial_readiness = db.Column(db.String(50), nullable=True)
+    q_hours_alone = db.Column(db.String(100), nullable=False)
+    other_pets = db.Column(db.String(255), nullable=False)
+    q_pet_experience = db.Column(db.Text, nullable=False)
+    financial_readiness = db.Column(db.String(50), nullable=False)
     
-    home_picture = db.Column(db.String(200), nullable=True) 
+    home_picture = db.Column(db.String(200), nullable=False) 
     
     application_date = db.Column(db.DateTime, default=datetime.utcnow) 
     approval_date = db.Column(db.DateTime, nullable=True)
@@ -232,7 +233,7 @@ class AdoptionApplication(db.Model):
 
 class ApplicationItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    application_id = db.Column(db.Integer, db.ForeignKey('adoption_application.id'), nullable=False)
+    adoption_application_id = db.Column(db.Integer, db.ForeignKey('adoption_application.id'), nullable=False)
     pet_id = db.Column(db.Integer, db.ForeignKey('pet.id'), nullable=False)
     pet = db.relationship('Pet', overlaps="applications,pet_record")
 
@@ -245,7 +246,7 @@ class AdminUser(db.Model):
 
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    admin_username = db.Column(db.String(50), nullable=False)
+    admin_id = db.Column(db.String(50), nullable=False)
     action = db.Column(db.String(255), nullable=False) 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -339,6 +340,16 @@ def adopt(pet_id):
         adopter_name = request.form.get('name')
         adopter_email = request.form.get('email')
 
+        if request.method == 'POST':
+        # 1. GET DATA FROM FORM
+            phone_number = request.form.get('phone_number')
+            home_address = request.form.get('home_address')
+
+        user = db.session.get(User, session.get('user_id'))
+        if user:
+            user.phone_number = phone_number = request.form.get('phone_number')
+            user.home_address = home_address = request.form.get('home_address')
+
         new_app = AdoptionApplication(
             user_id=session.get('user_id'),
             adopter_name=adopter_name,
@@ -346,8 +357,9 @@ def adopt(pet_id):
             id_proof=filename_id,
             home_picture=filename_home,
             status="Pending",
-            phone=request.form.get('phone'),
+            phone_number=request.form.get('phone_number'),
             occupation=request.form.get('occupation'),
+            home_address=request.form.get('home_address'),
             q_home_type=get_answer('q_home_type'),
             q_yard_access=get_answer('q_yard_access'),
             household_size=get_answer('household_size'),
@@ -905,6 +917,7 @@ def adopter_profile():
     if request.method == 'POST':
         new_name = request.form.get('name')
         new_email = request.form.get('email').lower()
+        new_address = request.form.get('home_address')
         
        
         if new_email != user.email:
@@ -953,6 +966,7 @@ def adopter_profile():
                 return redirect(url_for('adopter_profile'))
         
         user.full_name = new_name
+        user.home_address = new_address # <--- ADD THIS LINE
         db.session.commit()
         flash("Profile updated successfully.", "success")
         return redirect(url_for('adopter_profile'))
@@ -1123,6 +1137,8 @@ def update_admin_password(admin_id):
 @app.route('/submit_application', methods=['POST'])
 def submit_application():
     if not session.get('user_id'): return redirect(url_for('adopter_login'))
+
+    user = db.session.get(User, session.get('user_id'))
     
     cart = session.get('cart', [])
     if not cart:
@@ -1151,6 +1167,13 @@ def submit_application():
 
     adopter_name = request.form.get('name')
     adopter_email = request.form.get('email')
+    phone_number = request.form.get('phone_number')
+    home_address = request.form.get('home_address')
+
+    if user:
+        user.phone_number = phone_number
+        # If your application has a more detailed address, update it here
+        user.home_address = home_address
     
     new_app = AdoptionApplication(
         user_id=session['user_id'],
@@ -1159,9 +1182,9 @@ def submit_application():
         id_proof=filename_id,       
         home_picture=filename_home, 
         status="Pending",
-        phone=request.form.get('phone'),
+        phone_number=request.form.get('phone_number'),
         occupation=request.form.get('occupation'),
-        
+        home_address=request.form.get('home_address'),
         q_home_type=get_answer('q_home_type'),
         q_yard_access=get_answer('q_yard_access'),
         household_size=get_answer('household_size'),
@@ -1217,8 +1240,8 @@ def sync_adopters():
     apps = AdoptionApplication.query.filter(AdoptionApplication.status.in_(['Claimed', 'Adopted'])).all()
     for app in apps:
         for item in app.items:
-            # Set the pet's adopter_id to the person who applied
-            item.pet.adopter_id = app.user_id
+            # Set the pet's user_id to the person who applied
+            item.pet.user_id = app.user_id
     db.session.commit()
     return "Adopters Synced!"
 

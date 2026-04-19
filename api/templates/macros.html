@@ -13,18 +13,18 @@
             {% for pet in pet_list %}
             <tr class="hover-row">
     <td class="ps-4">
-        <div class="d-flex align-items-center gap-3">
-            <img src="{{ pet.photo if pet.photo and pet.photo.startswith('http') else url_for('static', filename='uploads/' + (pet.photo if pet.photo else 'images/default-pet.png')) }}" 
-                 class="rounded shadow-sm" 
-                 style="width: 45px; height: 45px; object-fit: cover; flex-shrink: 0;"
-                 onerror="this.src='https://via.placeholder.com/45';"">
+    <div class="d-flex align-items-center gap-3">
+        <img src="{{ pet.photo }}" 
+             class="rounded shadow-sm" 
+             style="width: 45px; height: 45px; object-fit: cover; flex-shrink: 0;"
+             onerror="this.src='https://via.placeholder.com/45';">
                         
-                        <div>
-                            <a href="{{ url_for('admin_view_pet', pet_id=pet.id) }}" 
-                               class="fw-bold text-decoration-none d-block" 
-                               style="color: var(--primary-navy); cursor: pointer; position: relative; z-index: 5;">
-                                {{ pet.name }} <span style="font-size: 0.8rem;">&nearr;</span>
-                            </a>
+        <div>
+            <a href="{{ url_for('admin_view_pet', pet_id=pet.id) }}" 
+               class="fw-bold text-decoration-none d-block" 
+               style="color: var(--primary-navy); cursor: pointer; position: relative; z-index: 5;">
+                {{ pet.name }} <span style="font-size: 0.8rem;">&nearr;</span>
+            </a>
                             {% if pet.special_needs == 'Yes' %}
                                 <span class="badge bg-warning text-dark rounded-0 px-2" style="font-size: 0.55rem;">SPECIAL NEEDS</span>
                             {% endif %}
