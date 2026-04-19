@@ -259,7 +259,7 @@ def get_current_admin():
 def log_action(action_text):
     curr = get_current_admin()
     if curr:
-        log = AuditLog(admin_username=curr.username, action=action_text)
+        log = AuditLog(admin_id=curr.username, action=action_text)
         db.session.add(log)
         db.session.commit()
 
