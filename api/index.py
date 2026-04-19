@@ -372,7 +372,7 @@ def adopt(pet_id):
         db.session.add(new_app)
         db.session.flush()
 
-        item = ApplicationItem(application_id=new_app.id, pet_id=pet.id)
+        item = ApplicationItem(adoption_application_id=new_app.id, pet_id=pet.id)
         db.session.add(item)
         db.session.commit()
 
@@ -1206,7 +1206,7 @@ def submit_application():
 
     pet_names_list = []
     for pet_id in cart:
-        item = ApplicationItem(application_id=new_app.id, pet_id=pet_id)
+        item = ApplicationItem(adoption_application_id=new_app.id, pet_id=pet_id)
         db.session.add(item)
         pet = db.session.get(Pet, pet_id)
         if pet: pet_names_list.append(pet.name)
