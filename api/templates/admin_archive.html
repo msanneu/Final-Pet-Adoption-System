@@ -10,9 +10,10 @@
         <p class="text-muted small mb-0 text-uppercase ls-2">Permanent System Audit Trail</p>
     </div>
     <div class="d-flex flex-wrap gap-2 align-items-center">
-        <span class="badge bg-navy px-3 py-2 shadow-sm rounded-pill small">
-            {{ history_apps|length }} RECORDS
-        </span>
+    <span class="badge rounded-pill bg-navy px-3 py-2 shadow-sm text-uppercase fw-bold ls-1" 
+          style="font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.1);">
+        {{ history_apps|length }} Records
+    </span>
         <a href="{{ url_for('export_history') }}" class="btn btn-outline-secondary btn-sm rounded-0 fw-bold px-3 shadow-sm flex-grow-1 flex-md-grow-0">
             <svg width="12" height="12" fill="currentColor" class="me-2" viewBox="0 0 16 16">
                 <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
