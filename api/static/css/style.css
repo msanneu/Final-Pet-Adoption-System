@@ -745,3 +745,16 @@ footer {
 .bg-navy {
     background-color: #001f3f !important; /* Or your preferred hex code */
 }
+
+.status-stamp {
+    padding: 3px 10px;
+    border-radius: 50px; /* Makes it a pill */
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.stamp-verified {
+    background-color: #001f3f; /* Navy */
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
