@@ -249,11 +249,13 @@
             DECLINE
         </button>
 
-        <a href="{{ url_for('approve_application', app_id=app.id) }}" 
-           class="btn btn-sanctuary-primary px-4 py-2 fw-bold shadow-sm" 
-           style="font-size: 0.7rem; letter-spacing: 1px;">
-           APPROVE ADOPTER
-        </a>
+        <button type="button" 
+        class="btn btn-approve-sanctuary px-4 py-3 py-sm-2 fw-bold"
+        data-adopter="{{ app.adopter_name }}"
+        data-approve-url="{{ url_for('approve_application', app_id=app.id) }}"
+        onclick="openApproveModal(this.dataset.adopter, this.dataset.approve_url)">
+            APPROVE ADOPTER
+        </button>
     </div>
 </div>
         </div>
