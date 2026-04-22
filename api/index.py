@@ -449,6 +449,15 @@ def admin_dashboard():
         flash("Please log in first.", "warning")
         return redirect(url_for('admin_login'))
 
+    # --- NEW METRIC CALCULATIONS ---
+    # Fetch total residents in the system
+    all_pets_count = Pet.query.count()
+
+    # Calculate applications received today (starting from 00:00:00)
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    apps_today_count = AdoptionApplication.query.filter(AdoptionApplication.application_date >= today_start).count()
+    # -------------------------------
+
     pending = AdoptionApplication.query.filter_by(status="Pending").all()
     from sqlalchemy import or_, and_
     
@@ -486,8 +495,10 @@ def admin_dashboard():
         AdoptionApplication.status.in_(["Returned", "Claimed", "Declined"])
     ).order_by(AdoptionApplication.application_date.desc()).all()
     total_finalized_adoptions = AdoptionApplication.query.filter_by(status="Claimed").count()
-    return render_template('admin_dashboard.html', 
-                       pets=Pet.query.all(), 
+    return render_template('admin_dashboard.html',
+                        pets_count=all_pets_count,
+                        today_apps=apps_today_count,
+                       pets=Pet.query.all(),    
                        pending_applications=pending, 
                        scheduled_apps=active_tasks,     
                        current_occupancy=current_occupancy,
@@ -496,6 +507,8 @@ def admin_dashboard():
                        logs=AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(50).all(),
                        history_apps=history, total_adoptions=total_finalized_adoptions,avg_processing_time=round(avg_hours, 2), reserved_pets=reserved_count,
                        login_mode=False)
+
+    
 
 @app.route('/admin/add_pet', methods=['POST'])
 def add_pet():
