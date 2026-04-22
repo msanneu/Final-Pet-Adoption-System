@@ -64,10 +64,13 @@
             <i class="bi bi-file-earmark-person me-1"></i> OPEN DOSSIER
         </button>
 
-        <a href="{{ url_for('approve_application', app_id=app.id) }}" 
-           class="btn btn-sanctuary-primary btn-sm py-2 px-3 fw-bold ls-1 shadow-sm">
-            <i class="bi bi-check2-circle me-1"></i> APPROVE
-        </a>
+        <button type="button" 
+        class="btn btn-sanctuary-primary btn-sm py-2 px-3 fw-bold ls-1 shadow-sm"
+        data-adopter="{{ app.adopter_name }}"
+        data-approve-url="{{ url_for('approve_application', app_id=app.id) }}"
+        onclick="openApproveModal(this.dataset.adopter, this.dataset.approve_url)">
+    <i class="bi bi-check2-circle me-1"></i> APPROVE
+</button>
 
         <button type="button" 
                 class="btn btn-outline-danger btn-sm py-2 px-3 fw-bold ls-1" 
@@ -271,6 +274,26 @@
     </div>
 </div>
 
+<div class="modal fade" id="approveConfirmationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+      <div class="modal-header border-0 bg-navy text-white p-4">
+        <h5 class="modal-title fw-bold text-uppercase ls-2" style="font-size: 1rem;">Confirm Approval</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <p class="mb-1">Are you sure you want to approve the application for:</p>
+        <h5 id="approveAdopterName" class="fw-bold text-navy mb-3"></h5>
+        <p class="text-muted small">This will officially update the pet's status and send an automated approval email to the adopter immediately.</p>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0 d-grid d-sm-flex justify-content-center gap-2">
+        <button type="button" class="btn btn-light px-4 fw-bold small ls-1" data-bs-dismiss="modal">CANCEL</button>
+        <a href="" id="confirmApproveBtn" class="btn btn-sanctuary-primary px-4 fw-bold small ls-1">CONFIRM APPROVAL</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="declineModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <form action="" id="declineForm" method="POST">
@@ -398,6 +421,18 @@ function openImageViewer(imageSrc) {
     imgElement.src = imageSrc;
     const imageModal = new bootstrap.Modal(document.getElementById('imageViewerModal'));
     imageModal.show();
+}
+
+// Logic to handle approval confirmation
+function openApproveModal(adopterName, url) {
+    // Set the name in the modal text
+    document.getElementById('approveAdopterName').innerText = adopterName;
+    // Update the link in the "Confirm" button
+    document.getElementById('confirmApproveBtn').href = url;
+    
+    // Show the modal
+    const approveModal = new bootstrap.Modal(document.getElementById('approveConfirmationModal'));
+    approveModal.show();
 }
 
 // Logic to handle rejection modal and dynamic form action
