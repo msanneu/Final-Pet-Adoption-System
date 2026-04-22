@@ -58,17 +58,26 @@
                         </div>
                     </td>
                     <td class="text-md-end pe-md-4 py-3">
-                        <div class="d-grid d-md-flex justify-content-md-end gap-2">
-                            <button class="btn btn-view-file btn-sm py-2" data-bs-toggle="modal" data-bs-target="#viewAppModal{{ app.id }}">OPEN DOSSIER</button>
-                            <a href="{{ url_for('approve_application', app_id=app.id) }}" class="btn btn-approve-sanctuary btn-sm py-2">APPROVE</a>
-                            <button type="button" 
-                                    class="btn btn-sm btn-outline-danger rounded-0 x-small fw-bold py-2" 
-                                    data-decline-url="{{ url_for('decline_application', app_id=app.id) }}"
-                                    onclick="openDeclineModal(this.dataset.declineUrl)">
-                                DECLINE
-                            </button>
-                        </div>
-                    </td>
+    <div class="d-grid d-md-flex justify-content-md-end gap-2">
+        <button class="btn btn-sanctuary-outline btn-sm py-2 px-3 fw-bold ls-1" 
+                data-bs-toggle="modal" data-bs-target="#viewAppModal{{ app.id }}">
+            <i class="bi bi-file-earmark-person me-1"></i> OPEN DOSSIER
+        </button>
+
+        <a href="{{ url_for('approve_application', app_id=app.id) }}" 
+           class="btn btn-sanctuary-primary btn-sm py-2 px-3 fw-bold ls-1 shadow-sm">
+            <i class="bi bi-check2-circle me-1"></i> APPROVE
+        </a>
+
+        <button type="button" 
+                class="btn btn-outline-danger btn-sm py-2 px-3 fw-bold ls-1" 
+                style="border-radius: 8px;"
+                data-decline-url="{{ url_for('decline_application', app_id=app.id) }}"
+                onclick="openDeclineModal(this.dataset.declineUrl)">
+            <i class="bi bi-x-circle me-1"></i> DECLINE
+        </button>
+    </div>
+</td>
                 </tr>
                 {% else %}
                 <tr><td colspan="3" class="text-center py-5 text-muted small italic">No new applications to review.</td></tr>
@@ -252,6 +261,38 @@
 </div>
 
 <style>
+
+    /* Custom Sanctuary Button Theme */
+.btn-sanctuary-primary {
+    background-color: #001f3f !important; /* Your Navy color */
+    color: #ffffff !important;
+    border: none;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-sanctuary-primary:hover {
+    background-color: #003366 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 31, 63, 0.2);
+}
+
+.btn-sanctuary-outline {
+    background-color: transparent;
+    color: #001f3f;
+    border: 1.5px solid #001f3f;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+}
+
+.btn-sanctuary-outline:hover {
+    background-color: #f8f9fa;
+    color: #001f3f;
+}
+
+.ls-1 { letter-spacing: 1px; font-size: 0.7rem; }
+
     .border-dashed { border-bottom: 1px dashed #ccc; }
     .text-navy { color: var(--primary-navy) !important; }
     .border-left-return { border-left: 5px solid #e74c3c; }
