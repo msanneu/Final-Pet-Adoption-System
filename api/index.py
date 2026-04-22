@@ -727,16 +727,9 @@ def admin_schedule():
 @app.route('/admin/archive')
 def admin_archive():
     if not get_current_admin(): return redirect(url_for('admin_login'))
-
+    
     history = AdoptionApplication.query.filter(AdoptionApplication.status.in_(["Returned", "Claimed"])).all()
-
-    return render_template('admin_archive.html', history_apps=history,
-    logs = db.session.query(
-        AuditLog.timestamp,
-        AuditLog.action,
-        AdminUser.username.label('admin_username')
-    ).join(AdminUser, AuditLog.admin_id == AdminUser.username).order_by(AuditLog.timestamp.desc()).limit(50).all())
-    # --------------------------------------------
+    return render_template('admin_archive.html', history_apps=history, logs=AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(50).all())
 
 @app.route('/admin/adopter/<int:user_id>')
 def admin_view_adopter(user_id):
