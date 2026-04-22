@@ -10,8 +10,8 @@
         <p class="text-muted small mb-0 text-uppercase ls-1">Verified Community Database</p>
     </div>
     <div class="text-md-end">
-        <span class="badge bg-navy px-4 py-2 shadow-sm rounded-pill w-auto" style="font-size: 0.8rem;">
-            {{ adopters|length }} REGISTERED USERS
+        <span class="badge bg-primary px-4 py-2 shadow-sm rounded-pill w-auto" style="font-size: 0.8rem;">
+    {{ adopters|length }} REGISTERED USERS
         </span>
     </div>
 </div>
@@ -98,6 +98,11 @@
 
 <style>
     /* Desktop Hover Effect */
+
+    .bg-navy {
+    background-color: #001f3f !important;
+    color: white; /* Ensures the text stays white */
+    }
     .hover-row:hover { background-color: #f8f9fa; }
     .shrink-0 { flex-shrink: 0; }
 
