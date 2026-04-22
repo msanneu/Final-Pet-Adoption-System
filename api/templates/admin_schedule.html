@@ -197,16 +197,39 @@
                         </div>
                     </div>
                     <div class="col-12">
-                    <h6 class="fw-bold text-uppercase x-small ls-2 text-muted mb-3 border-bottom pb-2">IV. Documents</h6>
-                    <div class="d-grid d-sm-flex gap-2">
-                        {% if app.id_proof %}
-                            <button type="button" data-img-src="{{ app.id_proof }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-view-file py-3 w-100">VIEW GOV ID</button>
-                        {% endif %}
-                        {% if app.home_picture %}
-                            <button type="button" data-img-src="{{ app.home_picture }}" onclick="openImageViewer(this.dataset.imgSrc)" class="btn btn-view-file py-3 w-100">VIEW HOME PHOTOS</button>
-                        {% endif %}
-                    </div>
+    <h6 class="fw-bold text-uppercase x-small ls-2 text-muted mb-3 border-bottom pb-2">IV. Documents</h6>
+    <div class="row g-2">
+        {% if app.id_proof %}
+        <div class="col-12 col-sm-6">
+            <div class="document-card d-flex align-items-center p-3 border rounded-3" 
+                 onclick="openImageViewer('{{ app.id_proof }}')" style="cursor: pointer;">
+                <div class="icon-box bg-navy-subtle me-3">
+                    <i class="bi bi-card-heading text-navy"></i>
                 </div>
+                <div>
+                    <div class="fw-bold small mb-0 text-navy">GOVERNMENT ID</div>
+                    <small class="text-muted x-small">Click to verify identity</small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if app.home_picture %}
+        <div class="col-12 col-sm-6">
+            <div class="document-card d-flex align-items-center p-3 border rounded-3" 
+                 onclick="openImageViewer('{{ app.home_picture }}')" style="cursor: pointer;">
+                <div class="icon-box bg-gold-subtle me-3">
+                    <i class="bi bi-house-door text-accent-gold"></i>
+                </div>
+                <div>
+                    <div class="fw-bold small mb-0 text-navy">HOME PHOTOS</div>
+                    <small class="text-muted x-small">Click to view environment</small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
                 </div>
             </div>
             <div class="modal-footer border-0 bg-light p-3 p-md-4 d-flex flex-column flex-sm-row justify-content-sm-between gap-3">
@@ -291,6 +314,34 @@
     color: #001f3f;
 }
 
+/* Document Card Styling */
+.document-card {
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+.document-card:hover {
+    border-color: var(--primary-navy) !important;
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.bg-navy-subtle { background-color: rgba(0, 31, 63, 0.1); }
+.bg-gold-subtle { background-color: rgba(197, 160, 89, 0.1); }
+.text-navy { color: #001f3f; }
+.text-accent-gold { color: #c5a059; }
+
 .ls-1 { letter-spacing: 1px; font-size: 0.7rem; }
 
     .border-dashed { border-bottom: 1px dashed #ccc; }
@@ -328,6 +379,7 @@
         .modal-fullscreen-sm-down .modal-content { height: 100%; border-radius: 0; }
         .modal-body { overflow-y: auto; }
     }
+
 </style>
 
 <script>
