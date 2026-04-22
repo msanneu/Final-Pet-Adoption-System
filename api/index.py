@@ -433,7 +433,9 @@ def adopter_dashboard():
 def admin_login():
     if request.method == 'POST':
         u, p = request.form.get('username'), request.form.get('password')
-        admin = AdminUser.query.filter_by(username=u).first()
+        # In your admin_login route:
+        username_lower = u.strip().lower()
+        admin = AdminUser.query.filter_by(username=username_lower).first()
         if admin and check_password_hash(admin.password_hash, p):
             session['admin_id'] = admin.id
             return redirect(url_for('admin_dashboard'))
@@ -1226,7 +1228,7 @@ def add_admin():
         flash("Username already exists!", "danger")
     else:
         hashed_pw = generate_password_hash(password)
-        new_admin = AdminUser(username=username, password_hash=hashed_pw)
+        new_admin = AdminUser(username=username_lower, password_hash=hashed_pw)
         db.session.add(new_admin)
         db.session.commit()
         log_action(f"Registered new staff member: {username_lower}")
