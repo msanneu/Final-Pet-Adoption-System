@@ -443,81 +443,133 @@ def admin_login():
     
 
 @app.route('/admin/dashboard')
+
 def admin_dashboard():
+
     curr_admin = get_current_admin()
-    if not curr_admin: 
+
+    if not curr_admin:
+
         flash("Please log in first.", "warning")
+
         return redirect(url_for('admin_login'))
 
+
+
     # --- NEW METRIC CALCULATIONS ---
+
     # Fetch total residents in the system
+
     all_pets_count = Pet.query.count()
 
+
+
     # Calculate applications received today (starting from 00:00:00)
+
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
     apps_today_count = AdoptionApplication.query.filter(AdoptionApplication.application_date >= today_start).count()
+
     # -------------------------------
 
+
+
     pending = AdoptionApplication.query.filter_by(status="Pending").all()
+
     from sqlalchemy import or_, and_
-    
+
+   
+
     active_tasks = AdoptionApplication.query.filter(
+
         and_(
+
         or_(
+
             AdoptionApplication.pickup_date != None),
+
         AdoptionApplication.status.notin_(["Declined", "Claimed"])
+
         )
+
     ).order_by(db.func.coalesce(AdoptionApplication.pickup_date).asc()).all()
+
     scheduled = AdoptionApplication.query.filter(
+
         or_(
+
             AdoptionApplication.pickup_date != None)
+
     ).order_by(db.func.coalesce(AdoptionApplication.pickup_date).asc()).all()
+
+
 
     approved_apps = AdoptionApplication.query.filter(AdoptionApplication.approval_date != None).all()
+
     total_seconds = 0
+
     count = 0
-    
+
+   
+
     for app in approved_apps:
+
         diff = app.approval_date - app.application_date
+
         total_seconds += diff.total_seconds()
+
         count += 1
-    
+
+   
+
     avg_hours = (total_seconds / count) / 3600 if count > 0 else 0
 
+
+
     total_capacity = 50
+
     current_occupancy = Pet.query.filter_by(status="Available").count()
+
     available_spots = total_capacity - current_occupancy
+
     occupancy_percent = (current_occupancy / total_capacity) * 100
-    
+
+   
+
     reserved_count = Pet.query.filter_by(status="Approved").count()
 
 
+
     history = AdoptionApplication.query.filter(
+
         AdoptionApplication.status.in_(["Returned", "Claimed", "Declined"])
+
     ).order_by(AdoptionApplication.application_date.desc()).all()
 
     total_finalized_adoptions = AdoptionApplication.query.filter_by(status="Claimed").count()
 
-
-    # 2. Prepare the logs (using the Join query we discussed to fix the "SYSTEM" name issue)
-    logs = db.session.query(
-        AuditLog.timestamp,
-        AuditLog.action,
-        AdminUser.username.label('admin_username')
-    ).join(AdminUser, AuditLog.admin_id == AdminUser.username).order_by(AuditLog.timestamp.desc()).limit(50).all()
-    
     return render_template('admin_dashboard.html',
+
                         pets_count=all_pets_count,
+
                         today_apps=apps_today_count,
-                       pets=Pet.query.all(),  
-                       logs=logs,
-                       pending_applications=pending, 
-                       scheduled_apps=active_tasks,     
+
+                       pets=Pet.query.all(),    
+
+                       pending_applications=pending,
+
+                       scheduled_apps=active_tasks,    
+
                        current_occupancy=current_occupancy,
+
                         available_spots=total_capacity - current_occupancy,
+
                         occupancy_percent=(current_occupancy / total_capacity) * 100,
+
                        logs=AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(50).all(),
+
                        history_apps=history, total_adoptions=total_finalized_adoptions,avg_processing_time=round(avg_hours, 2), reserved_pets=reserved_count,
+
                        login_mode=False)
 
     
