@@ -1466,7 +1466,7 @@ The PetAdopt Team
         log_action(f"Declined adoption request from {adopter_name}. Reason: {reason}")
         db.session.commit()
         
-    return redirect(url_for('admin_schedule'))
+    return redirect(url_for('admin_inventory'))
 
 @app.route('/admin/mark_claimed/<int:app_id>')
 def mark_claimed(app_id):
