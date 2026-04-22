@@ -309,11 +309,24 @@ def index():
 
 @app.route('/adopt/<int:pet_id>', methods=['GET', 'POST'])
 def adopt(pet_id):
+    uid = session.get('user_id')
     if not session.get('user_id'):
         flash("Please log in to apply.", "info")
         return redirect(url_for('adopter_login', next=url_for('adopt', pet_id=pet_id)))
 
     pet = Pet.query.get_or_404(pet_id)
+
+    # --- REDUNDANCY CHECK ---
+    # Check if this user already has a pending or approved application for THIS pet
+    existing_check = db.session.query(ApplicationItem).join(AdoptionApplication).filter(
+        AdoptionApplication.user_id == uid,
+        ApplicationItem.pet_id == pet_id,
+        AdoptionApplication.status.in_(["Pending", "Approved"])
+    ).first()
+
+    if existing_check:
+        flash(f"You already have an active application for {pet.name}.", "warning")
+        return redirect(url_for('adopter_dashboard'))
     
     if request.method == 'POST':
         file_id = request.files.get('id_proof')
@@ -487,6 +500,14 @@ def admin_dashboard():
 @app.route('/admin/add_pet', methods=['POST'])
 def add_pet():
     if not get_current_admin(): return redirect(url_for('admin_login'))
+    
+    pet_name = request.form.get('name').strip()
+
+    existing_pet = Pet.query.filter(Pet.name.ilike(pet_name)).first()
+    if existing_pet:
+        flash(f"A pet named '{pet_name}' already exists in the inventory.", "danger")
+        return redirect(url_for('admin_dashboard'))
+
     file = request.files.get('photo')
     filename, error = save_upload(file, 'pet-assets')
     if error:
@@ -519,7 +540,20 @@ def add_pet():
 def edit_pet(pet_id):
     if not get_current_admin(): return redirect(url_for('admin_login'))
     pet = Pet.query.get_or_404(pet_id)
+
     if request.method == 'POST':
+        # 1. Get and clean the new name
+        new_name = request.form.get('name').strip()
+        
+        # 2. REDUNDANCY CHECK: Look for another pet with this name
+        # .ilike() makes it case-insensitive (e.g., 'Buddy' == 'buddy')
+        # Pet.id != pet_id ensures we don't accidentally flag the pet's own current name
+        duplicate = Pet.query.filter(Pet.name.ilike(new_name), Pet.id != pet_id).first()
+        
+        if duplicate:
+            flash(f"Validation Error: The name '{new_name}' is already taken by another pet in the inventory.", "danger")
+            return redirect(url_for('edit_pet', pet_id=pet_id))
+        
         pet.name = request.form.get('name')
         pet.breed = request.form.get('breed')
         pet.age_category = request.form.get('age_category')
@@ -880,6 +914,22 @@ def google_authorize():
 
 @app.route('/add_to_cart/<int:pet_id>')
 def add_to_cart(pet_id):
+    uid = session.get('user_id')
+    if not uid:
+        flash("Please login to add pets to your selection.", "info")
+        return redirect(url_for('adopter_login'))
+
+    # CHECK IF ALREADY IN DB
+    existing_app = db.session.query(ApplicationItem).join(AdoptionApplication).filter(
+        AdoptionApplication.user_id == uid,
+        ApplicationItem.pet_id == pet_id,
+        AdoptionApplication.status.in_(["Pending", "Approved"])
+    ).first()
+
+    if existing_app:
+        flash("You have already submitted an application for this pet.", "warning")
+        return redirect(url_for('index'))
+    
     if 'cart' not in session:
         session['cart'] = []
     
@@ -1143,14 +1193,39 @@ def update_admin_password(admin_id):
 
 @app.route('/submit_application', methods=['POST'])
 def submit_application():
+    uid = session.get('user_id')
     if not session.get('user_id'): return redirect(url_for('adopter_login'))
 
     user = db.session.get(User, session.get('user_id'))
-    
     cart = session.get('cart', [])
     if not cart:
         flash("No pets selected for adoption.", "warning")
         return redirect(url_for('index'))
+    
+
+    # --- REDUNDANCY CHECK ---
+    # Find pets in the cart that the user has already applied for (Pending/Approved)
+    already_applied_items = db.session.query(ApplicationItem.pet_id).join(AdoptionApplication).filter(
+        AdoptionApplication.user_id == uid,
+        ApplicationItem.pet_id.in_(cart),
+        AdoptionApplication.status.in_(["Pending", "Approved"])
+    ).all()
+    
+    already_applied_ids = [item.pet_id for item in already_applied_items]
+
+    if already_applied_ids:
+        # If some pets are redundant, remove them from the cart/list
+        valid_cart = [pid for pid in cart if pid not in already_applied_ids]
+        
+        if not valid_cart:
+            flash("You have already applied for all the pets in your selection.", "danger")
+            session.pop('cart', None)
+            return redirect(url_for('adopter_dashboard'))
+        
+        # Alert the user that we are only moving forward with the new ones
+        flash("Some pets were removed from this application because you already have active requests for them.", "info")
+        cart = valid_cart # Continue with only the unique pets
+    # --- END CHECK ---
 
     # Upload ID to 'adopter-ids' bucket
     file_id = request.files.get('id_proof')
