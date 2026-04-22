@@ -67,8 +67,13 @@
                     </td>
 
                     <td class="mobile-label py-2" data-label="ROLE / PERMISSIONS:">
-                        <span class="status-stamp {% if admin.is_default %}stamp-verified{% else %}badge bg-light text-muted border{% endif %}" style="font-size: 0.65rem;">
-                            {% if admin.is_default %}SYSTEM ADMIN{% else %}AUTHORIZED STAFF{% endif %}
+                        <span class="status-stamp {% if admin.is_default %}stamp-verified{% else %}stamp-staff{% endif %}" 
+                            style="font-size: 0.6rem;">
+                            {% if admin.is_default %}
+                                SYSTEM ADMIN
+                            {% else %}
+                                AUTHORIZED STAFF
+                            {% endif %}
                         </span>
                     </td>
 
@@ -182,6 +187,50 @@
 {% endfor %}
 
 <style>
+
+    /* Base Stamp Styling */
+.status-stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    line-height: 1;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+/* System Admin: High Authority */
+.stamp-verified {
+    background-color: #001f3f; /* Your Navy */
+    color: #ffffff;
+    border: 1px solid #001f3f;
+    box-shadow: 0 2px 4px rgba(0, 31, 63, 0.15);
+}
+
+/* Authorized Staff: Clean & Subtle */
+.stamp-staff {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+/* Optional: Add a tiny dot icon for extra polish */
+.status-stamp::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.stamp-verified::before { background-color: #4cc9f0; /* Electric blue dot */ }
+.stamp-staff::before { background-color: #adb5bd; /* Grey dot */ }
+
+
     .btn-sanctuary-primary {
     background-color: #001f3f; /* Navy */
     color: white;
