@@ -615,7 +615,7 @@ def add_pet():
     return redirect(request.referrer or url_for('admin_dashboard'))
 
 
-@app.route('/admin/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
+@app.route('/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
 def edit_pet(pet_id):
     if not get_current_admin(): return redirect(url_for('admin_login'))
     pet = Pet.query.get_or_404(pet_id)
@@ -657,7 +657,7 @@ def edit_pet(pet_id):
         flash("Pet profile updated successfully!", "success")
         return redirect(url_for('admin_inventory'))
     
-    return render_template('admin/edit_pet.html', pet=pet)
+    return render_template('edit_pet.html', pet=pet)
 
 @app.route('/admin/delete_pet/<int:pet_id>')
 def delete_pet(pet_id):

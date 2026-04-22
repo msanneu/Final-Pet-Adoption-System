@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 p-3 p-md-4 bg-white shadow-sm" 
-     style="border-radius: 15px; border-left: 5px solid var(--accent-gold);">
+     style="border-radius: 15px; border-left: 5px solid var(--primary-navy);">
     <div class="mb-3 mb-md-0">
         <h2 class="display-6 fw-bold mb-0" style="color: var(--primary-navy); font-family: 'Playfair Display', serif; letter-spacing: -1px;">
             Adopter Registry
@@ -10,7 +10,7 @@
         <p class="text-muted small mb-0 text-uppercase ls-1">Verified Community Database</p>
     </div>
     <div class="text-md-end">
-        <span class="badge bg-primary px-4 py-2 shadow-sm rounded-pill w-auto" style="font-size: 0.8rem;">
+        <span class="badge bg-navy px-4 py-2 shadow-sm rounded-pill w-auto" style="font-size: 0.8rem;">
     {{ adopters|length }} REGISTERED USERS
         </span>
     </div>
@@ -72,22 +72,29 @@
                     </td>
 
                     <td class="mobile-label" data-label="Status:">
+                    <div class="status-wrapper">
                         {% if user.is_verified %}
-                            <span class="status-stamp stamp-verified">VERIFIED</span>
+                            <span class="status-stamp stamp-verified">
+                                <i class="fas fa-check-circle"></i> VERIFIED
+                            </span>
                         {% else %}
-                            <span class="status-stamp stamp-pending text-muted">PENDING</span>
+                            <span class="status-stamp stamp-pending">
+                                <i class="fas fa-clock"></i> PENDING
+                            </span>
                         {% endif %}
-                    </td>
+                    </div>
+                </td>
 
                     <td class="small text-muted mobile-label" data-label="Joined:">
                         {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'Legacy Record' }}
                     </td>
 
                     <td class="text-md-end pe-md-4 py-3">
-                        <a href="{{ url_for('admin_view_adopter', user_id=user.id) }}" class="btn btn-dossier-view shadow-sm w-100 w-md-auto">
-                            VIEW PROFILE &nearr;
-                        </a>
-                    </td>
+                    <a href="{{ url_for('admin_view_adopter', user_id=user.id) }}" class="btn btn-dossier-view shadow-sm">
+                        <span>VIEW PROFILE</span>
+                        <span class="arrow">&nearr;</span>
+                    </a>
+                </td>
                 </tr>
                 {% else %}
                 <tr><td colspan="4" class="text-center py-5 text-muted small italic">No registered adopters found.</td></tr>
@@ -111,6 +118,99 @@
 {% endwith %}
 
 <style>
+    .btn-dossier-view {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    /* These colors match the blueish tint in your image */
+    background-color: #f0f7ff !important; 
+    color: #001f3f !important;           
+    border: 1px solid #d0e1fd !important; 
+    
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 8px 20px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover State */
+.btn-dossier-view:hover {
+    background-color: #ffffff !important;
+    border-color: #001f3f !important;
+    color: #001f3f !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* The Arrow Animation */
+.btn-dossier-view .arrow {
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.btn-dossier-view:hover .arrow {
+    transform: translate(2px, -2px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 767.98px) {
+    .btn-dossier-view {
+        width: 100%; /* Match your w-100 class */
+        margin-top: 10px;
+    }
+}
+
+
+    /* Container alignment */
+.status-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+/* Base Stamp Styles */
+.status-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 50px; /* Pill shape */
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Verified Style (Green) */
+.stamp-verified {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #1b7b3d;
+}
+
+/* Pending Style (Gray/Amber) */
+.stamp-pending {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+}
+
+/* Optional: Pulse effect for Pending */
+.stamp-pending {
+    animation: soft-pulse 2s infinite ease-in-out;
+}
+
+@keyframes soft-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
     .btn-navy { 
         background-color: #1a2a3a; 
         color: white; 
@@ -178,12 +278,7 @@
             margin-bottom: 2px;
         }
         
-        /* Make the "View Profile" button stand out on mobile */
-        .btn-dossier-view {
-            margin-top: 10px;
-            display: block;
-            text-align: center;
-        }
+        
     }
 </style>
 

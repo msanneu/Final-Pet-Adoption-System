@@ -20,7 +20,7 @@
 </div>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 p-4 bg-white shadow-sm gap-3" 
-     style="border-radius: 15px; border-left: 5px solid var(--accent-gold); border-bottom: 1px solid #f0f0f0;">
+     style="border-radius: 15px; border-left: 5px solid var(--primary-navy); border-bottom: 1px solid #f0f0f0;">
     
     <div>
         <h2 class="display-6 fw-bold mb-0" style="color: var(--primary-navy); font-family: 'Playfair Display', serif; letter-spacing: -1px;">
@@ -83,7 +83,7 @@
     </ul>
 </div>
 
-<div class="tab-content card p-2 p-md-4 border-0 shadow-sm" id="inventoryTabsContent" style="border-top: 4px solid var(--accent-gold) !important; border-radius: 12px;">
+<div class="tab-content card p-2 p-md-4 border-0 shadow-sm" id="inventoryTabsContent" style="border-top: 4px solid var(--accent-navy) !important; border-radius: 12px;">
    
     <div class="tab-pane fade show active" id="available" role="tabpanel">
         {{ render_pet_table(pets|selectattr('status', 'equalto', 'Available')|list, "No available pets found.") }}
@@ -418,7 +418,7 @@
 <style>
     :root { 
         --primary-navy: #1a2a3a; 
-        --accent-gold: #c5a059; 
+        --accent-gold: #947c40; 
     }
     
     /* 1. LAYER & VISIBILITY FIXES */
