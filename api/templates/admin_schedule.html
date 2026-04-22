@@ -250,12 +250,13 @@
         </button>
 
         <button type="button" 
-        class="btn btn-approve-sanctuary px-4 py-3 py-sm-2 fw-bold"
+        class="btn btn-sanctuary-primary px-4 py-3 py-sm-2 fw-bold shadow-sm"
+        style="font-size: 0.7rem; letter-spacing: 1px;"
         data-adopter="{{ app.adopter_name }}"
         data-approve-url="{{ url_for('approve_application', app_id=app.id) }}"
         onclick="openApproveModal(this.dataset.adopter, this.dataset.approve_url)">
-            APPROVE ADOPTER
-        </button>
+    <i class="bi bi-check2-circle me-2"></i> APPROVE ADOPTER
+</button>
     </div>
 </div>
         </div>
@@ -413,6 +414,23 @@
         .modal-fullscreen-sm-down .modal-content { height: 100%; border-radius: 0; }
         .modal-body { overflow-y: auto; }
     }
+
+.btn-sanctuary-primary {
+    background-color: #001f3f !important; /* Your Navy */
+    color: #ffffff !important;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-sanctuary-primary:hover {
+    background-color: #003366 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 31, 63, 0.2) !important;
+}
 
 </style>
 
