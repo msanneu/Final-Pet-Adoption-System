@@ -1219,7 +1219,9 @@ def add_admin():
         flash("Invalid username format.", "danger")
         return redirect(url_for('manage_staff'))
     
-    existing = AdminUser.query.filter_by(username=username).first()
+    # 1. Normalize the input immediately
+    username_lower = username.strip().lower()
+    existing = AdminUser.query.filter_by(username=username_lower).first()
     if existing:
         flash("Username already exists!", "danger")
     else:
@@ -1227,8 +1229,8 @@ def add_admin():
         new_admin = AdminUser(username=username, password_hash=hashed_pw)
         db.session.add(new_admin)
         db.session.commit()
-        log_action(f"Registered new staff member: {username}")
-        flash(f"Staff account for {username} created successfully.", "success")
+        log_action(f"Registered new staff member: {username_lower}")
+        flash(f"Staff account for {username_lower} created successfully.", "success")
         
     return redirect(url_for('manage_staff'))
 
