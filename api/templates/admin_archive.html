@@ -87,41 +87,44 @@
                 </tr>
             </thead>
             <tbody>
-                {% for log in logs %}
-                <tr>
-                    <td class="ps-md-4 py-3">
-                        <div class="small text-muted font-monospace d-block d-md-inline" style="font-size: 0.7rem;">
-                            {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                        </div>
-                        <div class="d-md-none mt-1">
-                             <span class="badge rounded-0 border text-dark fw-bold px-2 py-1" 
-                                style="font-size: 0.65rem; background: #e9ecef;">
-                                {{ log.admin_username|upper if log.admin_username else "SYSTEM" }}
-                            </span>
-                        </div>
-                    </td>
-                    <td class="d-none d-md-table-cell">
-                        <span class="badge rounded-0 border text-dark fw-bold px-2 py-1" style="font-size: 0.6rem; background: #707f8e;">
-                            {{ log.admin_username|upper }}
-                        </span>
-                    </td>
-                    <td class="py-3">
-                    <div class="small text-dark text-wrap" style="max-width: 250px;">
-                        {{ log.action }}
-                        <div class="mt-1">
-                            {% if 'pet' in log.action.lower() or 'resident' in log.action.lower() %}
-                                <span class="badge bg-info-subtle text-info x-small border-info border" style="font-size: 0.5rem;">INVENTORY</span>
-                            {% elif 'adoption' in log.action.lower() or 'app' in log.action.lower() %}
-                                <span class="badge bg-success-subtle text-success x-small border-success border" style="font-size: 0.5rem;">LOGISTICS</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="3" class="text-center py-5 text-muted small italic">Security logs are currently empty.</td></tr>
-            {% endfor %}
-        </tbody>
+    {% for log in logs %}
+    <tr>
+        <td class="ps-md-4 py-3">
+            <div class="small text-muted font-monospace d-block d-md-inline" style="font-size: 0.7rem;">
+                {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            </div>
+            <div class="d-md-none mt-1">
+                 <span class="badge rounded-0 border fw-bold px-2 py-1" 
+                    style="font-size: 0.65rem; background: #f8f9fa; color: #333 !important;">
+                    {{ log.admin_username|upper if log.admin_username else "SYSTEM" }}
+                </span>
+            </div>
+        </td>
+        
+        <td class="d-none d-md-table-cell">
+            <span class="badge rounded-0 border fw-bold px-2 py-1" 
+                  style="font-size: 0.6rem; background: #e9ecef; color: #001f3f !important; display: inline-block; min-width: 80px;">
+                {{ log.admin_username|upper if log.admin_username else "SYSTEM" }}
+            </span>
+        </td>
+
+        <td class="py-3">
+            <div class="small text-dark text-wrap" style="max-width: 250px;">
+                {{ log.action }}
+                <div class="mt-1">
+                    {% if 'pet' in log.action.lower() or 'resident' in log.action.lower() %}
+                        <span class="badge bg-info-subtle text-info x-small border-info border" style="font-size: 0.5rem;">INVENTORY</span>
+                    {% elif 'adoption' in log.action.lower() or 'app' in log.action.lower() %}
+                        <span class="badge bg-success-subtle text-success x-small border-success border" style="font-size: 0.5rem;">LOGISTICS</span>
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="text-center py-5 text-muted small italic">Security logs are currently empty.</td></tr>
+    {% endfor %}
+</tbody>
         </table>
     </div>
 </div>
