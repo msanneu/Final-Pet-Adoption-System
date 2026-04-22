@@ -15,6 +15,8 @@
         .report-header { border-bottom: 3px solid var(--primary-navy); margin-bottom: 30px; padding-bottom: 10px; }
         .ls-1 { letter-spacing: 1px; }
         .bg-navy { background-color: var(--primary-navy) !important; }
+        .btn-navy { background-color: var(--primary-navy); color: white; transition: all 0.3s ease; border: none; }
+        .btn-navy:hover { background-color: #2c455e; color: white; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
         /* Print Logic */
         @media print {
@@ -22,16 +24,16 @@
             body { background-color: white !important; padding: 0; }
             .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
             .card { border: none !important; box-shadow: none !important; padding: 0 !important; }
-/* Corrected */
-.table th { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }            .d-print-block { display: block !important; }
+            .table th { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .d-print-block { display: block !important; }
         }
 
         /* Mobile specific adjustments */
         @media (max-width: 768px) {
             .report-card { padding: 1.5rem !important; }
             .report-header { flex-direction: column; align-items: flex-start !important; text-align: left; }
-/* Corrected */
-.report-header .text-end { text-align: left !important; margin-top: 15px; width: 100%; border-top: 1px solid #eee; padding-top: 0.5rem; }            .display-mobile-stack { flex-direction: column; }
+            .report-header .text-end { text-align: left !important; margin-top: 15px; width: 100%; border-top: 1px solid #eee; padding-top: 0.5rem; }
+            .display-mobile-stack { flex-direction: column; }
             h1 { font-size: 1.5rem; }
         }
     </style>
@@ -47,40 +49,39 @@
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="me-1">
                 <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"></path>
             </svg>
-            Print
+            Print Report
         </button>
     </div>
 
-    <div class="no-print mb-4 p-3 bg-white shadow-sm border">
-    <form method="GET" action="{{ url_for('monthly_report') }}" class="row g-2 align-items-end">
-        <div class="col-md-4">
-            <label class="small fw-bold text-uppercase ls-1">Select Month</label>
-            <select name="month" class="form-select rounded-0">
-                {% for m in range(1, 13) %}
-                <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>
-                    {{ datetime(2000, m, 1).strftime('%B') }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label class="small fw-bold text-uppercase ls-1">Select Year</label>
-            <select name="year" class="form-select rounded-0">
-                {% for y in range(2024, datetime.utcnow().year + 1) %}
-                <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-navy w-100 rounded-0">GENERATE REPORT</button>
-        </div>
-        <div class="col-md-2">
-            <button type="button" onclick="window.print()" class="btn btn-outline-dark w-100 rounded-0">PRINT</button>
-        </div>
-    </form>
-</div>
+    <div class="no-print mb-4 p-4 bg-white shadow-sm border">
+        <form method="GET" action="{{ url_for('monthly_report') }}" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="small fw-bold text-uppercase ls-1 text-muted mb-2 d-block">Select Reporting Month</label>
+                <select name="month" class="form-select rounded-0">
+                    {% for m in range(1, 13) %}
+                    <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>
+                        {{ datetime(2000, m, 1).strftime('%B') }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="small fw-bold text-uppercase ls-1 text-muted mb-2 d-block">Select Year</label>
+                <select name="year" class="form-select rounded-0">
+                    {% for y in range(2024, datetime.utcnow().year + 1) %}
+                    <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-navy w-100 rounded-0 py-2 fw-bold text-uppercase ls-1">
+                    Update Report
+                </button>
+            </div>
+        </form>
+    </div>
 
-    <div class="card report-card p-4 p-md-5 shadow-sm border-0">
+    <div class="card report-card p-4 p-md-5 shadow-sm border-0 bg-white">
         <div class="report-header d-flex justify-content-between align-items-end">
             <div>
                 <h1 class="fw-bold mb-0" style="color: var(--primary-navy);">PetAdopt Philippines</h1>
@@ -94,13 +95,12 @@
         
         <div class="row mb-4">
             <div class="col-12 col-sm-6 col-md-4">
-                <div class="border p-3 text-center bg-light rounded shadow-sm">
-    {# We count the total pets by summing the items in each application #}
-    <h2 class="fw-bold text-success mb-0">
-        {{ applications|map(attribute='items')|map('length')|sum }}
-    </h2>
-    <p class="small text-uppercase mb-0 ls-1 fw-bold text-muted">Successful Adoptions</p>
-</div>
+                <div class="border p-4 text-center bg-light rounded shadow-sm">
+                    <h2 class="fw-bold text-success mb-0" style="font-size: 2.5rem;">
+                        {{ applications|map(attribute='items')|map('length')|sum }}
+                    </h2>
+                    <p class="small text-uppercase mb-0 ls-1 fw-bold text-muted">Successful Adoptions</p>
+                </div>
             </div>
         </div>
 
@@ -116,21 +116,21 @@
                     </tr>
                 </thead>
                 <tbody>
-    {% for app in applications %}
-        {% for item in app.items %}
-        <tr>
-            <td class="small font-monospace text-muted">#APP-{{ app.id }}</td>
-            <td class="fw-bold text-navy">{{ item.pet.name }}</td>
-            <td class="small">{{ item.pet.breed }}</td>
-            <td class="small text-muted">{{ app.claim_date.strftime('%B %d, %Y') }}</td>
-        </tr>
-        {% endfor %}
-    {% else %}
-    <tr>
-        <td colspan="4" class="text-center py-5 text-muted small italic">No finalized adoptions found for this period.</td>
-    </tr>
-    {% endfor %}
-</tbody>
+                    {% for app in applications %}
+                        {% for item in app.items %}
+                        <tr>
+                            <td class="small font-monospace text-muted">#APP-{{ app.id }}</td>
+                            <td class="fw-bold" style="color: var(--primary-navy);">{{ item.pet.name }}</td>
+                            <td class="small">{{ item.pet.breed }}</td>
+                            <td class="small text-muted">{{ app.claim_date.strftime('%B %d, %Y') }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted small italic">No finalized adoptions found for this period.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
 
@@ -143,7 +143,7 @@
                 </div>
                 <div class="col-6 text-end">
                     <p class="small italic text-muted mb-0">"Creating families, one companion at a time."</p>
-                    <p class="x-small text-muted">© 2024 PetAdopt Philippines</p>
+                    <p class="x-small text-muted">© 2026 PetAdopt Philippines</p>
                 </div>
             </div>
         </div>
