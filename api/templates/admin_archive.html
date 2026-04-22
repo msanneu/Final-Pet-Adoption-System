@@ -93,10 +93,11 @@
             <div class="small text-muted font-monospace d-block d-md-inline" style="font-size: 0.7rem;">
                 {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
             </div>
+
             <div class="d-md-none mt-1">
                  <span class="badge rounded-0 border fw-bold px-2 py-1" 
                     style="font-size: 0.65rem; background: #f8f9fa; color: #333 !important;">
-                    {{ log.admin_username|upper if log.admin_id else "SYSTEM" }}
+                    {{ log.admin_id|upper if log.admin_id else "SYSTEM" }}
                 </span>
             </div>
         </td>
