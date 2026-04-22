@@ -491,14 +491,26 @@ def admin_dashboard():
     
     reserved_count = Pet.query.filter_by(status="Approved").count()
 
+
     history = AdoptionApplication.query.filter(
         AdoptionApplication.status.in_(["Returned", "Claimed", "Declined"])
     ).order_by(AdoptionApplication.application_date.desc()).all()
+
     total_finalized_adoptions = AdoptionApplication.query.filter_by(status="Claimed").count()
+
+
+    # 2. Prepare the logs (using the Join query we discussed to fix the "SYSTEM" name issue)
+    logs = db.session.query(
+        AuditLog.timestamp,
+        AuditLog.action,
+        AdminUser.username.label('admin_username')
+    ).join(AdminUser, AuditLog.admin_id == AdminUser.username).order_by(AuditLog.timestamp.desc()).limit(50).all()
+    
     return render_template('admin_dashboard.html',
                         pets_count=all_pets_count,
                         today_apps=apps_today_count,
-                       pets=Pet.query.all(),    
+                       pets=Pet.query.all(),  
+                       logs=logs,
                        pending_applications=pending, 
                        scheduled_apps=active_tasks,     
                        current_occupancy=current_occupancy,
