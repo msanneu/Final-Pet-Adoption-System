@@ -232,18 +232,27 @@
 </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 bg-light p-3 p-md-4 d-flex flex-column flex-sm-row justify-content-sm-between gap-3">
-                <button type="button" class="btn btn-cancel-sanctuary w-100 w-sm-auto order-3 order-sm-1" data-bs-dismiss="modal">CLOSE FILE</button>
-                <div class="d-grid d-sm-flex gap-2 w-100 w-sm-auto order-1 order-sm-2">
-                    <button type="button"
-                            class="btn btn-sm btn-outline-danger px-4 fw-bold x-small py-3 py-sm-2"
-                            data-decline-url="{{ url_for('decline_application', app_id=app.id) }}"
-                            onclick="openDeclineModal(this.dataset.declineUrl)">
-                        DECLINE
-                    </button>
-                    <a href="{{ url_for('approve_application', app_id=app.id) }}" class="btn btn-approve-sanctuary px-4 py-3 py-sm-2 fw-bold">APPROVE ADOPTER</a>
-                </div>
-            </div>
+            <div class="modal-footer border-0 bg-light p-3 p-md-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+    <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold small order-3 order-sm-1 p-0" data-bs-dismiss="modal">
+        CLOSE FILE
+    </button>
+
+    <div class="d-grid d-sm-flex gap-2 w-100 w-sm-auto order-1 order-sm-2">
+        <button type="button"
+                class="btn btn-outline-danger px-4 fw-bold x-small py-2"
+                style="font-size: 0.7rem; letter-spacing: 1px;"
+                data-decline-url="{{ url_for('decline_application', app_id=app.id) }}"
+                onclick="openDeclineModal(this.dataset.declineUrl)">
+            DECLINE
+        </button>
+
+        <a href="{{ url_for('approve_application', app_id=app.id) }}" 
+           class="btn btn-sanctuary-primary px-4 py-2 fw-bold shadow-sm" 
+           style="font-size: 0.7rem; letter-spacing: 1px;">
+           APPROVE ADOPTER
+        </a>
+    </div>
+</div>
         </div>
     </div>
 </div>
